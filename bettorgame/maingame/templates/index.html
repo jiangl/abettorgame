@@ -1,48 +1,62 @@
 {% include 'base_template.html' %}
 
+<!-- pass group object (per db contains name and particpatns) -->
+<h2 class="col text-center">Group: {{ group.name }}</h2>
+<h6 class="col text-center">Commissioner: {{ group.admin }}</h6>
+
+</br>
+
+<h4>Participants</h4>
+<div class="container">
+  <div class="row">
+    {% for participant in group.participants %}
+      <div class="col-3">
+        {{ participant }}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+<!-- actual index is below. using this page to test creative for now before creating routes -->
 <form>
-  <h2 class="col text-center">WELCOME BACK!</h2>
+  <h2 class="col text-center">Join a Group</h2>
   <div class="form-group row align-items-center">
-    <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
+    <label for="inputGroupId" class="col-sm-2 col-form-label">Enter Invite Code</label>
     <div class="col-sm-4">
-      <input type="email" class="form-control" id="inputEmail" placeholder="email@example.com">
+      <input type="groupId" class="form-control" id="inputGroupId" placeholder="ABCD">
     </div>
-  </div>
-  <div class="form-group row align-items-center">
-    <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
-    <div class="col-sm-4">
-      <input type="password" class="form-control" id="inputPassword" placeholder="Password">
-    </div>
-  </div>
   <div class="col text-center">
-    <button type="submit" class="btn btn-primary">LOG IN</button>
+    <button type="submit" class="btn btn-primary">JOIN GROUP</button>
   </div>
 </form>
 
 </br>
 </br>
+</br>
+</br>
 
 <form>
-  <h2 class="col text-center">NEW USER?</h2>
+  <h2 class="col text-center">Start a Group</h2>
   <div class="form-group row align-items-center">
-    <label for="inputFirstName" class="col-sm-2 col-form-label">First Name</label>
+    <label for="inputGroupName" class="col-sm-2 col-form-label">Enter Group Name</label>
     <div class="col-sm-4">
-      <input type="firstName" class="form-control" id="inputFirstName" placeholder="First Name">
+      <input type="groupName" class="form-control" id="inputGroupName" placeholder="Greater Wynnewood Exotic Animal Park">
     </div>
-  </div>
-  <div class="form-group row align-items-center">
-    <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
-    <div class="col-sm-4">
-      <input type="email" class="form-control" id="inputEmail" placeholder="email@example.com">
-    </div>
-  </div>
-  <div class="form-group row align-items-center">
-    <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
-    <div class="col-sm-4">
-      <input type="password" class="form-control" id="inputPassword" placeholder="Password">
-    </div>
-  </div>
   <div class="col text-center">
-    <button type="submit" class="btn btn-primary">CREATE ACCOUNT</button>
+    <button type="submit" class="btn btn-primary">JOIN GROUP</button>
   </div>
 </form>

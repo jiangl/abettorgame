@@ -1,0 +1,18 @@
+{% include 'base_template.html' %}
+
+<!-- pass group object (per db contains name and particpatns) -->
+<h2 class="col text-center">Group: {{ group.name }}</h2>
+<h6 class="col text-center">Commissioner: {{ group.admin }}</h6>
+
+</br>
+
+<h4>Participants</h4>
+<div class="container">
+  <div class="row">
+    {% for participant in group.participants %}
+      <div class="col-3">
+        {{ participant }}
+      </div>
+    {% endfor %}
+  </div>
+</div>
