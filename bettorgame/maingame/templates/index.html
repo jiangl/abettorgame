@@ -5,6 +5,7 @@
 <h6 class="col text-center">Commissioner: {{ group.admin }}</h6>
 
 </br>
+<hr/>
 
 <h4>Participants</h4>
 <div class="container">
@@ -16,6 +17,58 @@
     {% endfor %}
   </div>
 </div>
+
+</br>
+<hr/>
+</br>
+
+<h4>Current Bets</h4>
+{% for bet in group.bets %}
+<div class="container border">
+  <div class="row">
+      <div class="col font-weight-bold">
+        {{ bet.bet }}
+      </div>
+  </div>
+  <div class="row">
+      <div class="col font-italic">
+        Creator: {{ bet.creator }}
+      </div>
+  </div>
+   <div class="row">
+      <div class="col border">
+        {{ bet.option_1 }}
+      </div>
+      <div class="col border">
+        {{ bet.option_2 }}
+      </div>
+  </div>
+</div>
+</span>
+</br>
+{% endfor %}
+
+<hr/>
+
+</br>
+<form>
+  <div class="form-group">
+    <label for="formAddBet"><h4>Add New Bet</h4></label>
+    <input type="text" class="form-control" id="formAddBetExampleInput" placeholder="Is the DJ going to play Wagon Wheel?">
+  </div>
+  <div class="row">
+    <div class="col">
+      <input type="text" class="form-control" placeholder="100% Yes">
+    </div>
+    <div class="col">
+      <input type="text" class="form-control" placeholder="No Chance">
+    </div>
+  </div>
+</br>
+  <div class="col text-center">
+    <button type="submit" class="btn btn-primary">SUBMIT BET</button>
+  </div>
+</form>
 
 
 
