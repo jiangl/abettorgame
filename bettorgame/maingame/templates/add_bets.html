@@ -1,13 +1,12 @@
 {% include 'base_template.html' %}
 
 <!-- pass group object (per db contains name and particpatns) -->
-<h2 class="col text-center">Group: {{ group.name }}</h2>
+<h2 class="col text-center">{{ group.name }}</h2>
 <h6 class="col text-center">Commissioner: {{ group.admin }}</h6>
 
 </br>
-<hr/>
 
-<h4>Participants</h4>
+<h4 class="bg-secondary text-white">Participants</h4>
 <div class="container">
   <div class="row">
     {% for participant in group.participants %}
@@ -19,10 +18,9 @@
 </div>
 
 </br>
-<hr/>
 </br>
 
-<h4>Current Bets</h4>
+<h4 class="bg-secondary text-white">Current Bets</h4>
 {% for bet in group.bets %}
 <div class="container border">
   <div class="row">
@@ -48,12 +46,10 @@
 </br>
 {% endfor %}
 
-<hr/>
-
 </br>
 <form>
   <div class="form-group">
-    <label for="formAddBet"><h4>Add New Bet</h4></label>
+    <h4 class="bg-secondary text-white">Add New Bet</h4>
     <input type="text" class="form-control" id="formAddBetExampleInput" placeholder="Is the DJ going to play Wagon Wheel?">
   </div>
   <div class="row">
