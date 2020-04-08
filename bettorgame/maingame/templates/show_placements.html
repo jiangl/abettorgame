@@ -33,13 +33,19 @@
         {{ bet.bet }}
       </div>
   </div>
-  <div class="btn-group btn-group-toggle" data-toggle="buttons">
-    <label class="btn btn-lg btn-secondary border">
-      <input class="col" type="radio" name="options" id="option1" autocomplete="off"> {{ bet.option_1 }}
-    </label>
-    <label class="btn btn-lg btn-secondary border">
-      <input type="radio" name="options" id="option2" autocomplete="off"> {{ bet.option_2 }}
-    </label>
+  <div class="row">
+      <div class="col font-italic">
+        Creator: {{ bet.creator }}
+      </div>
+  </div>
+   <div class="row">
+      <!-- should store the bet ID and answer ID somewhere in the div? -->
+      <div class="col border bet-selection-div">
+        {{ bet.option_1 }}
+      </div>
+      <div class="col border bet-selection-div">
+        {{ bet.option_2 }}
+      </div>
   </div>
 </div>
 </span>
