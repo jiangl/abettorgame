@@ -1,0 +1,47 @@
+{% include 'base_template.html' %}
+
+<!-- pass group object (per db contains name and particpatns) -->
+<h2 class="col text-center">{{ group.name }}</h2>
+<h6 class="col text-center">Commissioner: {{ group.admin }}</h6>
+
+</br>
+
+<div class="container-fluid">
+  <div class="col-3"><h6 class>Bets Placed</h6>
+    {% for participant in group.participants_placed %}
+      <div class="row">
+        {{ participant }}
+      </div>
+    {% endfor %}
+    <div class="col-3"><h6 class>Awaiting</h6>
+    {% for participant in group.participants_awaiting %}
+      <div class="row">
+        {{ participant }}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+</br>
+</br>
+
+<h4 class="bg-secondary text-white">Bets</h4>
+{% for bet in group.bets %}
+<div class="container border">
+  <div class="row">
+      <div class="col font-weight-bold">
+        {{ bet.bet }}
+      </div>
+  </div>
+  <div class="btn-group btn-group-toggle" data-toggle="buttons">
+    <label class="btn btn-lg btn-secondary border">
+      <input class="col" type="radio" name="options" id="option1" autocomplete="off"> {{ bet.option_1 }}
+    </label>
+    <label class="btn btn-lg btn-secondary border">
+      <input type="radio" name="options" id="option2" autocomplete="off"> {{ bet.option_2 }}
+    </label>
+  </div>
+</div>
+</span>
+</br>
+{% endfor %}
