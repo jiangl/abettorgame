@@ -1,4 +1,4 @@
-{% include 'base_template.html' %}
+{% include 'base-template.html' %}
 
 <form>
   <h2 class="col text-center">WELCOME BACK!</h2>
@@ -22,7 +22,8 @@
 </br>
 </br>
 
-<form>
+<form action="{% url 'index' %}" method="post">
+  {% csrf_token %}
   <h2 class="col text-center">NEW USER?</h2>
   <div class="form-group row align-items-center">
     <label for="inputFirstName" class="col-sm-2 col-form-label">First Name</label>

@@ -28,12 +28,12 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-item nav-link active" href="#">Add Bets <span class="sr-only">(current)</span></a>
-          <a class="nav-item nav-link" href="#">Make Bets</a>
-          <a class="nav-item nav-link" href="#">Leaderboard</a>
-          <a class="nav-item nav-link" href="#">Log out</a>
+          <a class="nav-item nav-link active" href="add-bets">Add Bets <span class="sr-only">(current)</span></a>
+          <a class="nav-item nav-link" href="show-placements">Make Bets</a>
+          <a class="nav-item nav-link" href="leaderboard">Leaderboard</a>
+          <a class="nav-item nav-link" href="login">Log out</a>
           {% if group.admin == current_user %}
-            <a class="nav-item nav-link" href="#">ADMIN</a>
+            <a class="nav-item nav-link" href="group-admin">ADMIN</a>
           {% endif %}
         </div>
       </div>
