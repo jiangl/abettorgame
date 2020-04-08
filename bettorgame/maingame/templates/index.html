@@ -1,68 +1,5 @@
 {% include 'base_template.html' %}
 
-<!-- pass group object (per db contains name and particpatns) -->
-<h2 class="col text-center">{{ group.name }}</h2>
-<h6 class="col text-center">Commissioner: {{ group.admin }}</h6>
-
-</br>
-
-<div class="container-fluid">
-  <div class="col-3"><h6 class>Bets Placed</h6>
-    {% for participant in group.participants_placed %}
-      <div class="row">
-        {{ participant }}
-      </div>
-    {% endfor %}
-    <div class="col-3"><h6 class>Awaiting</h6>
-    {% for participant in group.participants_awaiting %}
-      <div class="row">
-        {{ participant }}
-      </div>
-    {% endfor %}
-  </div>
-</div>
-
-</br>
-</br>
-
-<h4 class="bg-secondary text-white">Bets</h4>
-{% for bet in group.bets %}
-<div class="container border">
-  <div class="row">
-      <div class="col font-weight-bold">
-        {{ bet.bet }}
-      </div>
-  </div>
-  <div class="row">
-      <div class="col font-italic">
-        Creator: {{ bet.creator }}
-      </div>
-  </div>
-   <div class="row">
-      <!-- should store the bet ID and answer ID somewhere in the div? -->
-      <div class="col border bet-selection-div">
-        {{ bet.option_1 }}
-      </div>
-      <div class="col border bet-selection-div">
-        {{ bet.option_2 }}
-      </div>
-  </div>
-</div>
-</span>
-</br>
-{% endfor %}
-
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-<!-- actual index is below. using this page to test creative for now before creating routes -->
 <form>
   <h2 class="col text-center">Join a Group</h2>
   <div class="form-group row align-items-center">
@@ -88,6 +25,6 @@
       <input type="groupName" class="form-control" id="inputGroupName" placeholder="Greater Wynnewood Exotic Animal Park">
     </div>
   <div class="col text-center">
-    <button type="submit" class="btn btn-primary">JOIN GROUP</button>
+    <button type="submit" class="btn btn-primary">CREATE GROUP</button>
   </div>
 </form>

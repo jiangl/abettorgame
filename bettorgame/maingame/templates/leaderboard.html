@@ -1,0 +1,52 @@
+{% include 'base_template.html' %}
+
+<!-- pass group object (per db contains name and particpatns) -->
+<h2 class="col text-center">{{ group.name }}</h2>
+<h6 class="col text-center">Commissioner: {{ group.admin }}</h6>
+
+</br> 
+
+<h2 class="col text-center">My Rank: {{user.stats.rank}}</h2>
+
+</br> 
+
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      Bets Won</br>
+      {{user.stats.won}}
+    </div>
+    <div class="col">
+      Bets Lost</br>
+      {{user.stats.won}}
+    </div>
+    <div class="col">
+      Bets Remaining</br>
+      {{user.stats.remaining}}
+    </div>
+  </div>
+</div>
+
+</br>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Won</th>
+      <th scope="col">Lost</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for participant in group.participant_standings %}
+    <tr>
+      <th scope="row">{{ forloop.counter }}</th>
+      <td>{{ participant.name }}</td>
+      <td>{{ participant.won }}</td>
+      <td>{{ participant.lost }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
