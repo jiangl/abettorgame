@@ -9,16 +9,22 @@
 
 </br>
 
-<div class="container-fluid">
-  <div class="col-3"><h6 class>Bets Placed</h6>
+<h4 class="bg-secondary text-white">Bets Placed</h4>
+<div class="container">
+  <div class="row">
     {% for participant in group.participants_placed %}
-      <div class="row">
+      <div class="col-3">
         {{ participant }}
       </div>
     {% endfor %}
-    <div class="col-3"><h6 class>Awaiting</h6>
+  </div>
+</div>
+
+<h4 class="bg-secondary text-white">Awaiting</h4>
+<div class="container">
+  <div class="row">
     {% for participant in group.participants_awaiting %}
-      <div class="row">
+      <div class="col-3">
         {{ participant }}
       </div>
     {% endfor %}
@@ -45,9 +51,19 @@
       <!-- should store the bet ID and answer ID somewhere in the div? -->
       <div class="col border bet-selection-div">
         {{ bet.option_1 }}
+        {% if group.started and not group.ended and group.admin == current_user %}
+          <div class="col text-center">
+            <button type="submit" class="btn btn-primary">SELECT WINNER</button>
+          </div>
+        {% endif %}
       </div>
       <div class="col border bet-selection-div">
         {{ bet.option_2 }}
+        {% if group.started and not group.ended and group.admin == current_user %}
+          <div class="col text-center">
+            <button type="submit" class="btn btn-primary">SELECT WINNER</button>
+          </div>
+        {% endif %}
       </div>
   </div>
 </div>

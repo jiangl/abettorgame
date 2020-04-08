@@ -7,6 +7,8 @@ def index(request):
     user = {}
     group['name'] = "Justin's 'Friends'"
     group['id'] = "ABCD"
+    group['started'] = True
+    group['ended'] = False
     group['participants'] = ['justin', 'lisa', 'brendan', 'lily', 'colin', 'kait', 'ellen', 'senem', 'nick', ' dave', 'john', 'peter']
     group['admin'] = 'justin'
     group['stakes'] = 'First round of beers at the bar'
