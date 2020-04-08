@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class StatusType(Enum):
     PENDING = 'PENDING'
     INITIATED = 'INITIATED'
@@ -8,3 +9,7 @@ class StatusType(Enum):
 
 class EventType(Enum):
     STANDARD = 'STANDARD'
+
+class UserRoles(Enum):
+    BASIC = 'BASIC'
+    ADMIN = 'ADMIN'
