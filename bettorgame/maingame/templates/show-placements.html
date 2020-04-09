@@ -1,0 +1,72 @@
+{% include 'base-template.html' %}
+
+<!-- pass group object (per db contains name and particpatns) -->
+<h2 class="col text-center">{{ group.name }}</h2>
+<h6 class="col text-center">Group ID: {{ group.id }}</h6>
+<h6 class="col text-center">Commissioner: {{ group.admin }}</h6>
+<h6 class="col text-center">Stakes: {{ group.stakes }}</h6>
+
+
+</br>
+
+<h4 class="bg-secondary text-white">Bets Placed</h4>
+<div class="container">
+  <div class="row">
+    {% for participant in group.participants_placed %}
+      <div class="col-3">
+        {{ participant }}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<h4 class="bg-secondary text-white">Awaiting</h4>
+<div class="container">
+  <div class="row">
+    {% for participant in group.participants_awaiting %}
+      <div class="col-3">
+        {{ participant }}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+</br>
+</br>
+
+<h4 class="bg-secondary text-white">Bets</h4>
+{% for bet in group.bets %}
+<div class="container border">
+  <div class="row">
+      <div class="col font-weight-bold">
+        {{ bet.bet }}
+      </div>
+  </div>
+  <div class="row">
+      <div class="col font-italic">
+        Creator: {{ bet.creator }}
+      </div>
+  </div>
+   <div class="row">
+      <!-- should store the bet ID and answer ID somewhere in the div? -->
+      <div class="col border bet-selection-div">
+        {{ bet.option_1 }}
+        {% if group.started and not group.ended and group.admin == current_user %}
+          <div class="col text-center">
+            <button type="submit" class="btn btn-primary">SELECT WINNER</button>
+          </div>
+        {% endif %}
+      </div>
+      <div class="col border bet-selection-div">
+        {{ bet.option_2 }}
+        {% if group.started and not group.ended and group.admin == current_user %}
+          <div class="col text-center">
+            <button type="submit" class="btn btn-primary">SELECT WINNER</button>
+          </div>
+        {% endif %}
+      </div>
+  </div>
+</div>
+</span>
+</br>
+{% endfor %}

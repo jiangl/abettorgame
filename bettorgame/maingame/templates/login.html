@@ -1,0 +1,49 @@
+{% include 'base-template.html' %}
+
+<form>
+  <h2 class="col text-center">WELCOME BACK!</h2>
+  <div class="form-group row align-items-center">
+    <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
+    <div class="col-sm-4">
+      <input type="email" class="form-control" id="inputEmail" placeholder="email@example.com">
+    </div>
+  </div>
+  <div class="form-group row align-items-center">
+    <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
+    <div class="col-sm-4">
+      <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+    </div>
+  </div>
+  <div class="col text-center">
+    <button type="submit" class="btn btn-primary">LOG IN</button>
+  </div>
+</form>
+
+</br>
+</br>
+
+<form action="{% url 'index' %}" method="post">
+  {% csrf_token %}
+  <h2 class="col text-center">NEW USER?</h2>
+  <div class="form-group row align-items-center">
+    <label for="inputFirstName" class="col-sm-2 col-form-label">First Name</label>
+    <div class="col-sm-4">
+      <input type="firstName" class="form-control" id="inputFirstName" placeholder="First Name">
+    </div>
+  </div>
+  <div class="form-group row align-items-center">
+    <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
+    <div class="col-sm-4">
+      <input type="email" class="form-control" id="inputEmail" placeholder="email@example.com">
+    </div>
+  </div>
+  <div class="form-group row align-items-center">
+    <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
+    <div class="col-sm-4">
+      <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+    </div>
+  </div>
+  <div class="col text-center">
+    <button type="submit" class="btn btn-primary">CREATE ACCOUNT</button>
+  </div>
+</form>
