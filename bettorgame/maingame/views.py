@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+
+from .models import User, Group, Event, UserGroupRole, UserEventRole, Bet, BetOption, Placement, Result, EventType, StatusType, UserRole
+
 import pdb
 
 # Test data
@@ -21,7 +24,7 @@ current_user = 'justin'
 
 # Create your views here.
 def index(request):
-    pdb.set_trace()
+    #pdb.set_trace()
     return render(request, 'index.html', {'group': group, 'user': user, 'current_user': current_user})
 
 def login(request):
