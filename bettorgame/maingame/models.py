@@ -19,8 +19,8 @@ class User(models.Model):
     join_date = models.DateTimeField()
     email = models.CharField(max_length=200)
     phone_number = models.IntegerField(
-        blank=True,
-        null=True
+        null=True,
+        blank=True
     )
 
 class Group(models.Model):
@@ -112,7 +112,7 @@ class Placement(models.Model):
         on_delete=models.CASCADE
     )
     option = models.ForeignKey(
-        BetOptions,
+        BetOption,
         null=True,
         on_delete=models.SET_NULL
     )

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from .models import User, Group, Event, UserGroupRole, UserEventRole, Bet, BetOptions, Placements, Results, EventType, StatusType, UserRole
+from .models import User, Group, Event, UserGroupRole, UserEventRole, Bet, BetOption, Placement, Result, EventType, StatusType, UserRole
 
 import pdb
 
