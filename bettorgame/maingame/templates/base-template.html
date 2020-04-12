@@ -32,7 +32,7 @@
           <a class="nav-item nav-link" href="show-placements">Make Bets</a>
           <a class="nav-item nav-link" href="leaderboard">Leaderboard</a>
           <a class="nav-item nav-link" href="login">Log out</a>
-          {% if group.admin == current_user %}
+          {% if user.role == 'ADMIN' %}
             <a class="nav-item nav-link" href="group-admin">ADMIN</a>
           {% endif %}
         </div>

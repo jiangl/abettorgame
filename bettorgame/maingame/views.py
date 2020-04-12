@@ -26,10 +26,10 @@ import pdb
 
 def index(request):
   #Q: how can we apply this to every page without putting the logic in ever view
-  if request.user.is_authenticated:
-    return render(request, 'index.html', {})
-  else:
-    return render(request, 'login.html', {})
+  # if request.user.is_authenticated:
+  return render(request, 'index.html', {})
+  # else:
+  #   return render(request, 'login.html', {})
 
 def join_group(request):
     try:
@@ -47,14 +47,17 @@ def join_group(request):
 
 #Q: should we be calling everything an event?
 def create_group(request):
-    #pdb.set_trace()
     #new_group = Event(name=request.POST["groupName"])
     new_group = Group()
     new_group.save()
-    #user = User.objects.get(id=request.user.id)
-    new_group.players.set()
-    new_event = Event(name=request.POST["groupName"])
-    commissioner = UserEventRole(user=request.user.id, event=new_group, role="ADMIN")
+    # user = User.objects.get(id=request.user.id)
+    user = User.objects.get(id=2)
+    pdb.set_trace()
+    new_group.players.add(user)
+    #new_event = Event(name=request.POST["groupName"])
+    new_event = Event(start_time=datetime.datetime.now(), end_time=datetime.datetime.now())
+    new_event.save()
+    commissioner = UserEventRole(user=user, event=new_event, role="ADMIN")
     commissioner.save()
 
     return HttpResponseRedirect('group-admin')
