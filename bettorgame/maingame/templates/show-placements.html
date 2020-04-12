@@ -51,6 +51,7 @@
       <!-- should store the bet ID and answer ID somewhere in the div? -->
       <div class="col border bet-selection-div">
         {{ bet.option_1 }}
+        <!-- Need to add in logic about the bet still being live (no winner selected) or also don't show the SELECT WINNER options - and highlight outline of box with color based on win / loss and if game ended tie -->
         {% if group.started and not group.ended and group.admin == current_user %}
           <div class="col text-center">
             <button type="submit" class="btn btn-primary">SELECT WINNER</button>

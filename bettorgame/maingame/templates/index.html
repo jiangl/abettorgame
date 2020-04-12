@@ -1,11 +1,13 @@
 {% include 'base-template.html' %}
 
-<form>
+<form action="{% url 'join_group' %}" method="post">
+  {% csrf_token %}
   <h2 class="col text-center">Join a Group</h2>
   <div class="form-group row align-items-center">
     <label for="inputGroupId" class="col-sm-2 col-form-label">Enter Invite Code</label>
+    <label class="col-sm-2">{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}</label>
     <div class="col-sm-4">
-      <input type="groupId" class="form-control" id="inputGroupId" placeholder="ABCD">
+      <input type="groupId" class="form-control" id="inputGroupId" name="groupId" placeholder="ABCD">
     </div>
   <div class="col text-center">
     <button type="submit" class="btn btn-primary">JOIN GROUP</button>
@@ -17,12 +19,14 @@
 </br>
 </br>
 
-<form>
+<form action="{% url 'create_group' %}" method="post">
+  {% csrf_token %}
   <h2 class="col text-center">Start a Group</h2>
   <div class="form-group row align-items-center">
     <label for="inputGroupName" class="col-sm-2 col-form-label">Enter Group Name</label>
+    <label class="col-sm-2">{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}</label>
     <div class="col-sm-4">
-      <input type="groupName" class="form-control" id="inputGroupName" placeholder="Greater Wynnewood Exotic Animal Park">
+      <input type="groupName" class="form-control" id="inputGroupName" name="groupName" placeholder="Greater Wynnewood Exotic Animal Park">
     </div>
   <div class="col text-center">
     <button type="submit" class="btn btn-primary">CREATE GROUP</button>
