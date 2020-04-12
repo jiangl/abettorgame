@@ -95,14 +95,14 @@ class Bet(models.Model):
     )
     multiplier = models.FloatField(default=1)
 
-class BetOptions(models.Model):
+class BetOption(models.Model):
     bet = models.ForeignKey(
         Bet,
         on_delete=models.CASCADE
     )
     text = models.CharField(max_length=200)
 
-class Placements(models.Model):
+class Placement(models.Model):
     player = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING
@@ -121,7 +121,7 @@ class Placements(models.Model):
         blank=True
     )
 
-class Results(models.Model):
+class Result(models.Model):
     player = models.ForeignKey(
         User,
         on_delete=models.CASCADE
