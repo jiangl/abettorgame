@@ -1,4 +1,3 @@
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from .utils import db_defaults
 
@@ -13,16 +12,20 @@ class UserRole(models.Model):
 
 class User(models.Model):
     first_name = models.CharField(max_length=200)
-    last_name = models.CharField(max_length=200)
+    last_name = models.CharField(
+        max_length=200,
+        blank=True
+    )
     join_date = models.DateTimeField()
     email = models.CharField(max_length=200)
     phone_number = models.IntegerField(
         blank=True,
-        default=''
+        null=True
     )
 
 class Group(models.Model):
     players = models.ManyToManyField(User)
+    name = models.CharField(max_length=200)
 
 class Event(models.Model):
     start_time = models.DateTimeField()
@@ -34,6 +37,7 @@ class Event(models.Model):
     )
     players = models.ManyToManyField(User)
     groups = models.ManyToManyField(Group)
+    name = models.CharField(max_length=200)
 
 
 class UserGroupRole(models.Model):
@@ -81,8 +85,8 @@ class Bet(models.Model):
 
     question = models.TextField()
     outcome = models.TextField()
-    on_the_line = models.TextField()
-    notes = models.TextField()
+    stakes = models.TextField()
+    notes = models.TextField(blank=True)
 
     status = models.ForeignKey(
         StatusType,
@@ -114,7 +118,7 @@ class Placements(models.Model):
     )
     custom_option = models.CharField(
         max_length=200,
-        null=True
+        blank=True
     )
 
 class Results(models.Model):
