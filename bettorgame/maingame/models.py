@@ -38,7 +38,7 @@ class Event(models.Model):
     players = models.ManyToManyField(User)
     groups = models.ManyToManyField(Group)
     name = models.CharField(max_length=200)
-
+    stakes = models.TextField()
 
 class UserGroupRole(models.Model):
     user = models.ForeignKey(
@@ -81,19 +81,17 @@ class Bet(models.Model):
     )
     created_time = models.DateTimeField()
     start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-
     question = models.TextField()
-    outcome = models.TextField()
-    stakes = models.TextField()
     notes = models.TextField(blank=True)
-
+    multiplier = models.FloatField(default=1)
     status = models.ForeignKey(
         StatusType,
         null=True,
         on_delete=models.SET_NULL
     )
-    multiplier = models.FloatField(default=1)
+
+    outcome = models.TextField(blank=True)
+    end_time = models.DateTimeField(null=True)
 
 class BetOption(models.Model):
     bet = models.ForeignKey(
@@ -136,3 +134,6 @@ class Result(models.Model):
     )
     score = models.FloatField()
     rank = models.IntegerField()
+
+#BetResult
+#EventResult
