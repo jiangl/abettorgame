@@ -1,10 +1,64 @@
-maingame_userrole:
+maingame_event:
+  header: [start_time, end_time, name, type_id, stakes]
+  data:
+    - [2020-04-12 14:53:26-04, 2020-04-12 14:53:28-04, Raising Seed, 1, $50000]
+maingame_event_groups:
+  header: [event_id, group_id]
+  data:
+    - [1, 1]
+maingame_event_players:
+  header: [event_id, user_id]
+  data:
+    - [1, 1]
+    - [1, 2]
+maingame_eventtype:
   header: [name]
   data:
-    - [BASIC2]
-    - [ADMIN2]
+    - [STANDARD]
+maingame_group:
+  header: [name]
+  data:
+    - [Founders Group]
+maingame_group_players:
+  header: [group_id, user_id]
+  data:
+    - [1, 1]
+    - [1, 2]
+maingame_statustype:
+  header: [name]
+  data:
+    - [PENDING]
+    - [INITIATED]
+    - [COMPLETE]
+    - [FAILED]
 maingame_user:
   header: [first_name, last_name, join_date, email, phone_number]
   data:
-    - [Lisa2, '', 2020-04-12 14:47:57-04, feefifofisa@gmail.com, ~]
-    - [Justin2, '', 2020-04-12 14:47:57-04, jncn1183@gmail.com, ~]
+    - [Lisa, '', 2020-04-12 14:47:57-04, feefifofisa@gmail.com, ~]
+    - [Justin, '', 2020-04-12 14:47:57-04, jncn1183@gmail.com, ~]
+maingame_usergrouprole:
+  header: [group_id, role_id, user_id]
+  data:
+    - [1, 1, 1]
+maingame_usereventrole:
+  header: [event_id, role_id, user_id]
+  data:
+    - [1, 1, 1]
+    - [1, 2, 2]
+maingame_userrole:
+  header: [name]
+  data:
+    - [BASIC]
+    - [ADMIN]
+maingame_bet:
+  header: [created_time, start_time, question, notes, multiplier, outcome, end_time, creator_id, event_id, status_id]
+  data:
+    - [2020-04-12 21:17:41-04, 2020-04-12 21:17:43-04, Will we get into YC?, '', 1, '', 2020-04-30 08:00:00-04, 1, 1, 1]
+    - [2020-04-12 21:20:41-04, 2020-04-12 21:17:43-04, How much money will we get during our first fundraise?, '', 1, '', 2020-04-30 08:00:00-04, 1, 1, 1]
+    - [2020-04-12 23:17:41-04, 2020-04-12 21:17:43-04, Will Lisa move to Argentina?, '', 1, '', 2020-04-30 08:00:00-04, 2, 1, 1]
+maingame_betoption:
+  header: [text, bet_id]
+  data:
+    - [$1, 2]
+    - [10000, 2]
+    - ['>100000', 2]

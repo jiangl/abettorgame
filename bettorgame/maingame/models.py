@@ -119,7 +119,7 @@ class Placement(models.Model):
         blank=True
     )
 
-class Result(models.Model):
+class BetResult(models.Model):
     player = models.ForeignKey(
         User,
         on_delete=models.CASCADE
@@ -128,12 +128,16 @@ class Result(models.Model):
         Bet,
         on_delete=models.CASCADE
     )
+    score = models.FloatField()
+
+class EventResult(models.Model):
+    player = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
     event_id = models.ForeignKey(
         Event,
         on_delete=models.CASCADE
     )
     score = models.FloatField()
     rank = models.IntegerField()
-
-#BetResult
-#EventResult
