@@ -39,7 +39,16 @@ def add_bets(request):
 
     return render(request, 'add-bets.html', {'group': group, 'user': user, 'current_user': current_user})
 
-def show_placements(request):
+def show_placements(request, group_id, event_id):
+    # go to: http://127.0.0.1:8000/main/1/1/show-placements/
+    player_firstnames = [player.first_name for player in Event.objects.get(id=event_id).players.all()]
+    print(player_firstnames)
+
+    bets = Bet.objects.filter(event_id=event_id)
+    for bet in bets:
+        print("Creator:", bet.creator)
+        print("Question:", bet.question)
+        print("Placements: ", Placement.objects.filter(bet_id=bet.id))
 
     return render(request, 'show-placements.html', {'group': group, 'user': user, 'current_user': current_user})
 
