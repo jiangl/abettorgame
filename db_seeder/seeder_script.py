@@ -1,10 +1,8 @@
 #!/usr/bin/env python
-import sys, getopt
 import yaml
 import logging
 import psycopg2
 import argparse
-import re
 
 
 log = logging.getLogger(__name__)
@@ -55,7 +53,6 @@ def insert_csv_values(cursor, filename):
 
 def main(datafile, config="config.yaml"):
     connection = None
-
     try:
         connection, cursor = connect_from_yaml(config)
         log.info("Connected to PostgreSQL database.")
