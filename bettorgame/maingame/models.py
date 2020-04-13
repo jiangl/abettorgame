@@ -124,7 +124,7 @@ class BetResult(models.Model):
         User,
         on_delete=models.CASCADE
     )
-    bet_id = models.ForeignKey(
+    bet = models.ForeignKey(
         Bet,
         on_delete=models.CASCADE
     )
@@ -135,7 +135,7 @@ class EventResult(models.Model):
         User,
         on_delete=models.CASCADE
     )
-    event_id = models.ForeignKey(
+    event = models.ForeignKey(
         Event,
         on_delete=models.CASCADE
     )

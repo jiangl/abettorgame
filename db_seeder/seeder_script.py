@@ -49,6 +49,8 @@ def insert_csv_values(cursor, filename):
         bulk_values = tables[table]['data']
 
         for row in bulk_values:
+            print(mod_sql)
+            print(tuple(row))
             cursor.execute(mod_sql, tuple(row))
 
 def main(datafile, config="config.yaml"):
@@ -57,8 +59,8 @@ def main(datafile, config="config.yaml"):
         connection, cursor = connect_from_yaml(config)
         log.info("Connected to PostgreSQL database.")
         insert_csv_values(cursor, datafile)
-        connection.commit()
         log.info("Successfully inserted values.")
+        connection.commit()
     except:
         log.exception("Something fucked up.")
         return None
