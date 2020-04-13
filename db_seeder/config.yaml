@@ -1,0 +1,5 @@
+user: vardo
+password: notsecure
+database: bettorgamedb
+host: '127.0.0.1'
+port: '5432'
