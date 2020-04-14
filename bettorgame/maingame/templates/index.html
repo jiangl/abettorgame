@@ -1,13 +1,13 @@
 {% include 'base-template.html' %}
 
-<form action="{% url 'join_group' %}" method="post">
+<form action="{% url 'join_group_and_event' %}" method="post">
   {% csrf_token %}
   <h2 class="col text-center">Join a Group</h2>
   <div class="form-group row align-items-center">
-    <label for="inputGroupId" class="col-sm-2 col-form-label">Enter Invite Code</label>
+    <label for="inputEventId" class="col-sm-2 col-form-label">Enter Invite Code</label>
     <label class="col-sm-2">{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}</label>
     <div class="col-sm-4">
-      <input type="groupId" class="form-control" id="inputGroupId" name="groupId" placeholder="ABCD">
+      <input type="groupAndEventId" class="form-control" id="inputGroupAndEventId" name="groupAndEventId" placeholder="27-34">
     </div>
   <div class="col text-center">
     <button type="submit" class="btn btn-primary">JOIN GROUP</button>
@@ -19,7 +19,7 @@
 </br>
 </br>
 
-<form action="{% url 'create_group' %}" method="post">
+<form action="{% url 'create_group_and_event' %}" method="post">
   {% csrf_token %}
   <h2 class="col text-center">Start a Group</h2>
   <div class="form-group row align-items-center">

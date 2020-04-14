@@ -16,7 +16,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <!-- JS Functions -->
-    {% if not group.started %}
+    {% if betting_is_open %}
     <script src="js/bet_handlers.js"></script>
     {% endif %}
 
@@ -32,7 +32,7 @@
           <a class="nav-item nav-link" href="show-placements">Make Bets</a>
           <a class="nav-item nav-link" href="leaderboard">Leaderboard</a>
           <a class="nav-item nav-link" href="login">Log out</a>
-          {% if user.role == 'ADMIN' %}
+          {% if request.session.is_admin %}
             <a class="nav-item nav-link" href="group-admin">ADMIN</a>
           {% endif %}
         </div>

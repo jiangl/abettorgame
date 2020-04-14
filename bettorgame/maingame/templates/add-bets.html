@@ -1,19 +1,19 @@
 {% include 'base-template.html' %}
 
 <!-- pass group object (per db contains name and particpatns) -->
-<h2 class="col text-center">{{ group.name }}</h2>
-<h6 class="col text-center">Group ID: {{ group.id }}</h6>
-<h6 class="col text-center">Commissioner: {{ group.admin }}</h6>
-<h6 class="col text-center">Stakes: {{ group.stakes }}</h6>
+<h2 class="col text-center">{{ event.name }}</h2>
+<h6 class="col text-center">Group ID: {{ group_id }}-{{ event.id }}</h6>
+<h6 class="col text-center">Commissioner: {{ event_commissioner }}</h6>
+<h6 class="col text-center">Stakes: {{ event.stakes }}</h6>
 
 </br>
 
 <h4 class="bg-secondary text-white">Participants</h4>
 <div class="container">
   <div class="row">
-    {% for participant in group.participants %}
+    {% for first_name in player_first_names %}
       <div class="col-3">
-        {{ participant }}
+        {{ first_name }}
       </div>
     {% endfor %}
   </div>
