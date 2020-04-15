@@ -23,9 +23,15 @@ def join_group_and_event(request):
       groupAndEventIdArray = request.POST["groupAndEventId"].split('-')
       group = Group.objects.get(id=groupAndEventIdArray[0])
       event = Event.objects.get(id=groupAndEventIdArray[1])
+    except (ValueError):
+        # Redisplay the question voting form.
+        return render(request, 'index.html', {'error_message': "There is no Group with that code."})
     except (KeyError, Event.DoesNotExist):
         # Redisplay the question voting form.
-        return render(request, 'index.html', {'error_message': "There is no Group with that ID."})
+        return render(request, 'index.html', {'error_message': "There is no Group with that code."})
+    except (KeyError, Group.DoesNotExist):
+        # Redisplay the question voting form.
+        return render(request, 'index.html', {'error_message': "There is no Group with that code."})
     else:
       #connect user to group/event
       request.session['is_admin'] = "ADMIN" == UserEventRole.objects.get(user=request.user.id, event=event.id)
@@ -97,13 +103,36 @@ def end_event(request, group_id, event_id):
 def add_bets(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
 
-    #admin_role = UserRole.objects.get(name="ADMIN")
-    #how to access the enum?
-    #event_commissioner = UserEventRole.objects.get(role="ADMIN", event=event.id)
+    event_commissioner = UserEventRole.objects.get(role=1, event=event.id).user.first_name
 
     player_first_names = [player.first_name for player in event.players.all()]
 
-    return render(request, 'add-bets.html', {'event': event, 'group_id': group_id, 'player_first_names': player_first_names}) #'event_commissioner': event_commissioner
+    try:
+      bets_list = []
+      bets = Bet.objects.filter(event=event.id)
+      for bet in bets:
+        bets_list.append({'bet': bet, 'bet_options': BetOption.objects.filter(bet=bet).order_by('id')})
+    except:
+      bets_list = None
+
+    return render(request, 'add-bets.html', {'event': event, 'group_id': group_id, 'player_first_names': player_first_names, 'event_commissioner': event_commissioner, 'bets_list': bets_list})
+
+def create_bet(request, group_id, event_id):
+    event = Event.objects.get(id=event_id)
+    creator = User.objects.get(id=request.user.id)
+    #remove stakes, outcome once db updated
+    #should StatusType ID be 0? but there is no object with an ID of 0
+    #update timing for start and end
+    new_bet = Bet(creator=creator, event=event, created_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), start_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), end_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), question=request.POST['betQuestion'], status=StatusType.objects.get(id=1))
+    new_bet.save()
+
+    new_bet_option_1 = BetOption(bet=new_bet, text=request.POST['betOption1'])
+    new_bet_option_1.save()
+
+    new_bet_option_2 = BetOption(bet=new_bet, text=request.POST['betOption2'])
+    new_bet_option_2.save()
+
+    return HttpResponseRedirect(reverse('add_bets', args=(group_id,event.id,)))
 
 def show_placements(request):
 

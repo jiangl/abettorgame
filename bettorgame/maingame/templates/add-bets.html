@@ -23,24 +23,24 @@
 </br>
 
 <h4 class="bg-secondary text-white">Current Bets</h4>
-{% for bet in group.bets %}
+{% for bet in bets_list %}
 <div class="container border">
   <div class="row">
       <div class="col font-weight-bold">
-        {{ bet.bet }}
+        {{ bet.bet.question }}
       </div>
   </div>
   <div class="row">
       <div class="col font-italic">
-        Creator: {{ bet.creator }}
+        Creator: {{ bet.bet.creator.first_name }}
       </div>
   </div>
    <div class="row">
       <div class="col border">
-        {{ bet.option_1 }}
+        {{ bet.bet_options.0.text }}
       </div>
       <div class="col border">
-        {{ bet.option_2 }}
+        {{ bet.bet_options.1.text }}
       </div>
   </div>
 </div>
@@ -49,17 +49,18 @@
 {% endfor %}
 
 </br>
-<form>
+<form action="{% url 'create_bet' group_id event.id %}" method="post">
+  {% csrf_token %}
   <div class="form-group">
     <h4 class="bg-secondary text-white">Add New Bet</h4>
-    <input type="text" class="form-control" id="formAddBetExampleInput" placeholder="Is the DJ going to play Wagon Wheel?">
+    <input type="text" class="form-control" id="formAddBetExampleInput" name="betQuestion" placeholder="Is the DJ going to play Wagon Wheel?">
   </div>
   <div class="row">
     <div class="col">
-      <input type="text" class="form-control" placeholder="100% Yes">
+      <input type="text" class="form-control" name="betOption1" placeholder="100% Yes">
     </div>
     <div class="col">
-      <input type="text" class="form-control" placeholder="No Chance">
+      <input type="text" class="form-control" name="betOption2" placeholder="No Chance">
     </div>
   </div>
 </br>
