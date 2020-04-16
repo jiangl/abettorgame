@@ -107,6 +107,7 @@ def add_bets(request, group_id, event_id):
 
     player_first_names = [player.first_name for player in event.players.all()]
 
+    #should this be moved to a method somewhere outside of this file so I can reuse?
     try:
       bets_list = []
       bets = Bet.objects.filter(event=event.id)
@@ -134,10 +135,68 @@ def create_bet(request, group_id, event_id):
 
     return HttpResponseRedirect(reverse('add_bets', args=(group_id,event.id,)))
 
-def show_placements(request):
+def show_placements(request, group_id, event_id):
+    event = Event.objects.get(id=event_id)
 
-    return render(request, 'show-placements.html', {})
+    event_commissioner = UserEventRole.objects.get(role=1, event=event.id).user
 
-def leaderboard(request):
+    # Same comment as in add_bets
+    try:
+      bets_list = []
+      bets = Bet.objects.filter(event=event.id)
+      number_of_bets = len(bets)
+      for bet in bets:
+        bets_list.append({'bet': bet, 'bet_options': BetOption.objects.filter(bet=bet).order_by('id')})
+    except:
+      bets_list = None
+
+
+    try:
+      players_bets_placed = []
+      players_bets_awaiting = []
+      for player in event.players.all():
+        if len(Placement.objects.filter(player=player)) == number_of_bets:
+          players_bets_placed.append(player.first_name)
+        else:
+          players_bets_awaiting.append(player.first_name)
+    except:
+      players_bets_placed = []
+      players_bets_awaiting = []
+
+    # still need to add placements so they render correctly for each user
+
+    #this is reused code from above - move out into a function?
+    is_event_started = event.start_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
+    is_event_ended = event.end_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
+    event_status = {'is_event_started': is_event_started, 'is_event_ended': is_event_ended}
+
+    is_admin = event_commissioner.id == request.user.id
+
+    return render(request, 'show-placements.html', {'event': event, 'group_id': group_id, 'event_commissioner': event_commissioner, 'bets_list': bets_list, 'players_bets_placed': players_bets_placed, 'players_bets_awaiting': players_bets_awaiting, 'event_status': event_status, 'is_admin': is_admin})
+
+def create_placements(request, group_id, event_id):
+    event = Event.objects.get(id=event_id)
+    user = User.objects.get(id=request.user.id)
+
+
+    return HttpResponseRedirect(reverse('show_placements', args=(group_id,event_id,)))
+
+def leaderboard(request, group_id, event_id):
 
     return render(request, 'leaderboard.html', {})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

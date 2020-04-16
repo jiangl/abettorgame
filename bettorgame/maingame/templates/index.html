@@ -5,7 +5,9 @@
   <h2 class="col text-center">Join a Group</h2>
   <div class="form-group row align-items-center">
     <label for="inputEventId" class="col-sm-2 col-form-label">Enter Invite Code</label>
-    <label class="col-sm-2">{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}</label>
+    {% if error_message %}
+      <label class="col-sm-2"><p><strong>{{ error_message }}</strong></p></label>
+    {% endif %}
     <div class="col-sm-4">
       <input type="groupAndEventId" class="form-control" id="inputGroupAndEventId" name="groupAndEventId" placeholder="27-34">
     </div>

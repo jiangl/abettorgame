@@ -1,10 +1,13 @@
 {% include 'base-template.html' %}
+<!-- JS Functions -->
+{% if event_status is defined and not event_status.is_event_started %}
+  {% include 'js/bet_handlers.js' %}
+{% endif %}
 
-<!-- pass group object (per db contains name and particpatns) -->
-<h2 class="col text-center">{{ group.name }}</h2>
-<h6 class="col text-center">Group ID: {{ group.id }}</h6>
-<h6 class="col text-center">Commissioner: {{ group.admin }}</h6>
-<h6 class="col text-center">Stakes: {{ group.stakes }}</h6>
+<h2 class="col text-center">{{ event.name }}</h2>
+<h6 class="col text-center">Group ID: {{ group_id }}-{{ event.id }}</h6>
+<h6 class="col text-center">Commissioner: {{ event_commissioner.first_name }}</h6>
+<h6 class="col text-center">Stakes: {{ event.stakes }}</h6>
 
 
 </br>
@@ -12,9 +15,9 @@
 <h4 class="bg-secondary text-white">Bets Placed</h4>
 <div class="container">
   <div class="row">
-    {% for participant in group.participants_placed %}
+    {% for player in players_bets_placed %}
       <div class="col-3">
-        {{ participant }}
+        {{ player }}
       </div>
     {% endfor %}
   </div>
@@ -23,9 +26,9 @@
 <h4 class="bg-secondary text-white">Awaiting</h4>
 <div class="container">
   <div class="row">
-    {% for participant in group.participants_awaiting %}
+    {% for player in players_bets_awaiting %}
       <div class="col-3">
-        {{ participant }}
+        {{ player }}
       </div>
     {% endfor %}
   </div>
@@ -35,39 +38,46 @@
 </br>
 
 <h4 class="bg-secondary text-white">Bets</h4>
-{% for bet in group.bets %}
-<div class="container border">
-  <div class="row">
-      <div class="col font-weight-bold">
-        {{ bet.bet }}
-      </div>
+
+<form action="{% url 'create_placements' group_id event.id %}" method="post">
+  {% csrf_token %}
+  {% for bet in bets_list %}
+  <div class="container border">
+    <div class="row">
+        <div class="col font-weight-bold">
+          {{ bet.bet.question }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col font-italic">
+          Creator: {{ bet.bet.creator.first_name }}
+        </div>
+    </div>
+     <div class="row">
+        <!-- should store the bet ID and answer ID somewhere in the div? -->
+        <div class="col border bet-selection-div">
+          {{ bet.bet_options.0.text }}
+          <!-- Need to add in logic about the bet still being live (no winner selected) or also don't show the SELECT WINNER options - and highlight outline of box with color based on win / loss and if game ended tie -->
+          {% if event_status.is_event_started and not event_status.is_event_ended and is_admin %}
+            <div class="col text-center">
+              <button type="submit" class="btn btn-primary">SELECT WINNER</button>
+            </div>
+          {% endif %}
+        </div>
+        <div class="col border bet-selection-div">
+          {{ bet.bet_options.1.text }}
+          {% if event_status.is_event_started and not event_status.is_event_ended and is_admin %}
+            <div class="col text-center">
+              <button type="submit" class="btn btn-primary">SELECT WINNER</button>
+            </div>
+          {% endif %}
+        </div>
+    </div>
   </div>
-  <div class="row">
-      <div class="col font-italic">
-        Creator: {{ bet.creator }}
-      </div>
+  </span>
+  </br>
+  {% endfor %}
+  <div class="col text-center">
+    <button type="submit" class="btn btn-primary">LOCK IN BETS</button>
   </div>
-   <div class="row">
-      <!-- should store the bet ID and answer ID somewhere in the div? -->
-      <div class="col border bet-selection-div">
-        {{ bet.option_1 }}
-        <!-- Need to add in logic about the bet still being live (no winner selected) or also don't show the SELECT WINNER options - and highlight outline of box with color based on win / loss and if game ended tie -->
-        {% if group.started and not group.ended and group.admin == current_user %}
-          <div class="col text-center">
-            <button type="submit" class="btn btn-primary">SELECT WINNER</button>
-          </div>
-        {% endif %}
-      </div>
-      <div class="col border bet-selection-div">
-        {{ bet.option_2 }}
-        {% if group.started and not group.ended and group.admin == current_user %}
-          <div class="col text-center">
-            <button type="submit" class="btn btn-primary">SELECT WINNER</button>
-          </div>
-        {% endif %}
-      </div>
-  </div>
-</div>
-</span>
-</br>
-{% endfor %}
+</form>
