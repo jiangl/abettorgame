@@ -7,7 +7,7 @@
     <h4 class="bg-secondary text-white">Welcome Commissioner!</h4>
     <h5>What are the stakes?</h5>
     {% if not event_status.is_event_started %}
-    <input type="text" class="form-control" id="formSetStakesExampleInput" name="setStakes" placeholder="$20, Everyone buys the winner a beer, etc.">
+    <input type="text" class="form-control" id="formSetStakesExampleInput" name="setStakes" placeholder="$20, Everyone buys the winner a beer, etc." required>
     {% else %}
     <input class="form-control" type="text" placeholder="{{ event.stakes }}" readonly>
     {% endif %}

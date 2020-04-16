@@ -52,14 +52,14 @@
   {% csrf_token %}
   <div class="form-group">
     <h4 class="bg-secondary text-white">Add New Bet</h4>
-    <input type="text" class="form-control" id="formAddBetExampleInput" name="betQuestion" placeholder="Is the DJ going to play Wagon Wheel?">
+    <input type="text" class="form-control" id="formAddBetExampleInput" name="betQuestion" placeholder="Is the DJ going to play Wagon Wheel?" required>
   </div>
   <div class="row">
     <div class="col">
-      <input type="text" class="form-control" name="betOption1" placeholder="100% Yes">
+      <input type="text" class="form-control" name="betOption1" placeholder="100% Yes" required>
     </div>
     <div class="col">
-      <input type="text" class="form-control" name="betOption2" placeholder="No Chance">
+      <input type="text" class="form-control" name="betOption2" placeholder="No Chance" required>
     </div>
   </div>
 </br>

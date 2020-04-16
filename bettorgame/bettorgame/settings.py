@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # Custom middleware
+    'maingame.middleware.AuthenticateUser'
 ]
 
 ROOT_URLCONF = 'bettorgame.urls'

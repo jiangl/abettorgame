@@ -11,6 +11,41 @@ import pdb
 #UserEventRole.objects.get(user=request.user.id, event=event_id))
 #can this be done more intelligently with middleware?
 
+def login(request):
+
+    return render(request, 'login.html', {})
+
+def login_user(request):
+    try:
+      email = request.POST["loginEmail"]
+      existing_user = User.objects.get(email=email)
+      if existing_user:
+        request.session['is_authenticated'] = True
+
+        return HttpResponseRedirect(reverse('index'))
+
+    except (KeyError, User.DoesNotExist):
+      # Redisplay the login form.
+      return render(request, 'login.html', {'error_message_login': "Hmm, we don't have that email registered. Maybe there was a typo or sign up under 'New User' below!"})
+    
+
+def create_user(request):
+    email = request.POST["createEmail"]
+    existing_user = User.objects.filter(email=email)
+    
+    if existing_user:
+      return render(request, 'login.html', {'error_message_create': "This email is already registered. Please login above!"})
+    
+    else:
+      first_name = request.POST["createFirstName"]
+      join_date = datetime.datetime.now().replace(tzinfo=pytz.UTC)
+
+      new_user = User(first_name=first_name, join_date=join_date, email=email)
+      new_user.save()
+
+      request.session['is_authenticated'] = True
+      return HttpResponseRedirect(reverse('index'))
+
 def index(request):
   #Q: how can we apply this to every page without putting the logic in ever view
   # if request.user.is_authenticated:
@@ -65,10 +100,6 @@ def create_group_and_event(request):
     request.session['is_admin'] = True
 
     return HttpResponseRedirect(reverse('group_admin', args=[new_group.id, new_event.id]))
-
-def login(request):
-
-    return render(request, 'login.html', {})
 
 def group_admin(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
@@ -178,12 +209,19 @@ def create_placements(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     user = User.objects.get(id=request.user.id)
 
+    # need all the logic here - struggling with the JS working
+
 
     return HttpResponseRedirect(reverse('show_placements', args=(group_id,event_id,)))
 
 def leaderboard(request, group_id, event_id):
+    event = Event.objects.get(id=event_id)
+    event_commissioner = UserEventRole.objects.get(role=1, event=event.id).user
 
-    return render(request, 'leaderboard.html', {})
+    user = User.objects.get(id=request.user.id)
+
+
+    return render(request, 'leaderboard.html', {'event': event, 'group_id': group_id, 'event_commissioner': event_commissioner})
 
 
 
