@@ -1,7 +1,8 @@
 from django.shortcuts import render
+<<<<<<< HEAD
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from .models import User, Group, Event, UserGroupRole, UserEventRole, Bet, BetOption, Placement, Result, EventType, StatusType, UserRole
+from .models import User, Group, Event, UserGroupRole, UserEventRole, Bet, BetOption, Placement, EventResult, BetResult, EventType, StatusType, UserRole
 from django.contrib import messages
 import datetime
 import pytz
