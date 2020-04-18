@@ -29,7 +29,12 @@ def login_user(request):
 
     except (KeyError, User.DoesNotExist):
       # Redisplay the login form.
-      return render(request, 'login.html', {'error_message_login': "Hmm, we don't have that email registered. Maybe there was a typo or sign up under 'New User' below!"})
+      return render(
+        request, 
+        'login.html', 
+        {
+        'error_message_login': "Hmm, we don't have that email registered. Maybe there was a typo or sign up under 'New User' below!"
+        })
     
 
 def create_user(request):
@@ -39,7 +44,12 @@ def create_user(request):
       )
     
     if existing_user:
-      return render(request, 'login.html', {'error_message_create': "This email is already registered. Please login above!"})
+      return render(
+        request, 
+        'login.html', 
+        {
+        'error_message_create': "This email is already registered. Please login above!"
+        })
     
     else:
       first_name = request.POST["createFirstName"]
@@ -48,16 +58,14 @@ def create_user(request):
       User.objects.create(
         first_name=first_name, 
         join_date=join_date, 
-        email=email)
+        email=email
+        )
 
       return HttpResponseRedirect(reverse('index'))
 
 def index(request):
-  #Q: how can we apply this to every page without putting the logic in ever view
-  # if request.user.is_authenticated:
+
   return render(request, 'index.html', {})
-  # else:
-  #   return render(request, 'login.html', {})
 
 def join_group_and_event(request):
     try:
@@ -73,7 +81,12 @@ def join_group_and_event(request):
 
     except:
         # Redisplay the question voting form.
-        return render(request, 'index.html', {'error_message': "There is no Group with that code."})
+        return render(
+          request, 
+          'index.html', 
+          {
+          'error_message': "There is no Group with that code."
+          })
 
 def create_group_and_event(request):
     new_group = Group.objects.create(
@@ -125,9 +138,19 @@ def group_admin(request, group_id, event_id):
 
     is_event_started = event.start_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
     is_event_ended = event.end_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
-    event_status = {'is_event_started': is_event_started, 'is_event_ended': is_event_ended}
+    event_status = {
+    'is_event_started': is_event_started, 
+    'is_event_ended': is_event_ended
+    }
 
-    return render(request, 'group-admin.html', {'event': event, 'group': group, 'event_status': event_status})
+    return render(
+      request, 
+      'group-admin.html', 
+      {
+      'event': event, 
+      'group': group, 
+      'event_status': event_status
+      })
 
 def set_stakes(request, group_id, event_id):
     event = Event.objects.get(
@@ -172,11 +195,24 @@ def add_bets(request, group_id, event_id):
         event=event_id
         )
       for bet in bets:
-        bets_list.append({'bet': bet, 'bet_options': BetOption.objects.filter(bet=bet).order_by('id')})
+        bets_list.append(
+          {
+          'bet': bet, 
+          'bet_options': BetOption.objects.filter(bet=bet).order_by('id')
+          })
     except:
       bets_list = None
 
-    return render(request, 'add-bets.html', {'event': event, 'group_id': group_id, 'player_first_names': player_first_names, 'event_commissioner': event_commissioner, 'bets_list': bets_list})
+    return render(
+      request, 
+      'add-bets.html', 
+      {
+      'event': event, 
+      'group_id': group_id, 
+      'player_first_names': player_first_names, 
+      'event_commissioner': event_commissioner, 
+      'bets_list': bets_list
+      })
 
 def create_bet(request, group_id, event_id):
     event = Event.objects.get(
@@ -201,7 +237,7 @@ def create_bet(request, group_id, event_id):
       text=request.POST['betOption1']
       )
 
-   BetOption.objects.create(
+    BetOption.objects.create(
       bet=new_bet, 
       text=request.POST['betOption2']
       )
@@ -239,10 +275,22 @@ def show_placements(request, group_id, event_id):
             )
           if bet_option_placements:
             player_first_names = ', '.join([bet_option.player.first_name for bet_option in bet_option_placements])
-            bet_options_and_names.append({'bet_option': bet_option, 'player_first_names': player_first_names})
+            bet_options_and_names.append(
+              {
+              'bet_option': bet_option, 
+              'player_first_names': player_first_names
+              })
           else:
-            bet_options_and_names.append({'bet_option': bet_option, 'player_first_names': ''})
-        bets_list.append({'bet': bet, 'bet_options': bet_options_and_names})
+            bet_options_and_names.append(
+              {
+              'bet_option': bet_option, 
+              'player_first_names': ''
+              })
+        bets_list.append(
+          {
+          'bet': bet, 
+          'bet_options': bet_options_and_names
+          })
     except:
       bets_list = None
 
@@ -264,12 +312,27 @@ def show_placements(request, group_id, event_id):
     #this is reused code from above - move out into a function?
     is_event_started = event.start_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
     is_event_ended = event.end_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
-    event_status = {'is_event_started': is_event_started, 'is_event_ended': is_event_ended}
+    event_status = {
+    'is_event_started': is_event_started, 
+    'is_event_ended': is_event_ended
+    }
 
     #replace below logic with authentication and logic in view
     is_admin = event_commissioner.id == request.user.id
 
-    return render(request, 'show-placements.html', {'event': event, 'group_id': group_id, 'event_commissioner': event_commissioner, 'bets_list': bets_list, 'players_bets_placed': players_bets_placed, 'players_bets_awaiting': players_bets_awaiting, 'event_status': event_status, 'is_admin': is_admin})
+    return render(
+      request, 
+      'show-placements.html', 
+      {
+      'event': event, 
+      'group_id': group_id, 
+      'event_commissioner': event_commissioner, 
+      'bets_list': bets_list, 
+      'players_bets_placed': players_bets_placed, 
+      'players_bets_awaiting': players_bets_awaiting, 
+      'event_status': event_status, 
+      'is_admin': is_admin
+      })
 
 def create_placements(request, group_id, event_id):
     event = Event.objects.get(
@@ -297,7 +360,14 @@ def leaderboard(request, group_id, event_id):
       )
 
 
-    return render(request, 'leaderboard.html', {'event': event, 'group_id': group_id, 'event_commissioner': event_commissioner})
+    return render(
+      request, 
+      'leaderboard.html', 
+      {
+      'event': event, 
+      'group_id': group_id, 
+      'event_commissioner': event_commissioner
+      })
 
 
 
