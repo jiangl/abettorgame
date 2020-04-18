@@ -16,6 +16,7 @@ def login(request):
     return render(request, 'login.html', {})
 
 def login_user(request):
+    #Lisa will be updating authetntication
     try:
       email = request.POST["loginEmail"]
       existing_user = User.objects.get(
@@ -44,13 +45,11 @@ def create_user(request):
       first_name = request.POST["createFirstName"]
       join_date = datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
-      new_user = User(
+      User.objects.create(
         first_name=first_name, 
         join_date=join_date, 
         email=email)
-      new_user.save()
 
-      request.session['is_authenticated'] = True
       return HttpResponseRedirect(reverse('index'))
 
 def index(request):
@@ -77,22 +76,20 @@ def join_group_and_event(request):
         return render(request, 'index.html', {'error_message': "There is no Group with that code."})
 
 def create_group_and_event(request):
-    new_group = Group(
+    new_group = Group.objects.create(
       name=request.POST["groupName"]
       )
-    new_group.save()  
 
     placeholder_future_start_date = datetime.datetime.now().replace(tzinfo=pytz.UTC) + datetime.timedelta(days=365)
     placeholder_future_end_date = placeholder_future_start_date + datetime.timedelta(days=7)
     placeholder_stakes = 'TBD'
 
-    new_event = Event(
+    new_event = Event.objects.create(
       start_time=placeholder_future_start_date, 
       end_time=placeholder_future_end_date, 
       name=new_group.name, 
       stakes=placeholder_stakes
       )
-    new_event.save()
 
     user = User.objects.get(
       id=request.user.id
@@ -104,21 +101,17 @@ def create_group_and_event(request):
 
     role_admin = UserRole.objects.get(id=1)
 
-    group_commissioner = UserGroupRole(
+    UserGroupRole.objects.create(
       user=user, 
       group=new_group, 
       role=role_admin
       )
-    group_commissioner.save()
     
-    event_commissioner = UserEventRole(
+    UserEventRole.objects.create(
       user=user, 
       event=new_event, 
       role=role_admin
       )
-    event_commissioner.save()
-
-    request.session['is_admin'] = True
 
     return HttpResponseRedirect(reverse('group_admin', args=[new_group.id, new_event.id]))
 
@@ -194,7 +187,7 @@ def create_bet(request, group_id, event_id):
       )
 
     #should StatusType ID be 0? but there is no object with an ID of 0
-    new_bet = Bet(
+    new_bet = Bet.objects.create(
       creator=creator, 
       event=event, 
       created_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), 
@@ -203,19 +196,16 @@ def create_bet(request, group_id, event_id):
       question=request.POST['betQuestion'], 
       status=StatusType.objects.get(id=1)
       )
-    new_bet.save()
 
-    new_bet_option_1 = BetOption(
+    BetOption.objects.create(
       bet=new_bet, 
       text=request.POST['betOption1']
       )
-    new_bet_option_1.save()
 
-    new_bet_option_2 = BetOption(
+   BetOption.objects.create(
       bet=new_bet, 
       text=request.POST['betOption2']
       )
-    new_bet_option_2.save()
 
     return HttpResponseRedirect(reverse('add_bets', args=(group_id,event.id,)))
 
