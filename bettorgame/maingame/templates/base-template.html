@@ -19,18 +19,18 @@
     <!-- Nav -->
     <!-- Hide nav if on login or create and join group pages -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">A Bettor Game</a>
+      <a class="navbar-brand" href="{% url 'maingame:index' %}">A Bettor Game</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-item nav-link active" href="add-bets">Add Bets <span class="sr-only">(current)</span></a>
-          <a class="nav-item nav-link" href="show-placements">Make Bets</a>
-          <a class="nav-item nav-link" href="leaderboard">Leaderboard</a>
-          <a class="nav-item nav-link" href="login">Log out</a>
+          <a class="nav-item nav-link active" href="{% url 'maingame:add_bets' group_id event.id %}">Add Bets <span class="sr-only">(current)</span></a>
+          <a class="nav-item nav-link" href="{% url 'maingame:show_placements' group_id event.id %}">Make Bets</a>
+          <a class="nav-item nav-link" href="{% url 'maingame:leaderboard' group_id event.id %}">Leaderboard</a>
+          <a class="nav-item nav-link" href="{% url 'maingame:login' %}">Log out</a>
           {% if request.session.is_admin %}
-            <a class="nav-item nav-link" href="group-admin">ADMIN</a>
+            <a class="nav-item nav-link" href="{% url 'maingame:group_admin' group_id event.id %}">ADMIN</a>
           {% endif %}
         </div>
       </div>

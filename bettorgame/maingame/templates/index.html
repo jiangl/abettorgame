@@ -1,6 +1,6 @@
 {% include 'base-template.html' %}
 
-<form action="{% url 'join_group_and_event' %}" method="post">
+<form action="{% url 'maingame:join_group_and_event' %}" method="post">
   {% csrf_token %}
   <h2 class="col text-center">Join a Group</h2>
   <div class="form-group row align-items-center">
@@ -21,7 +21,7 @@
 </br>
 </br>
 
-<form action="{% url 'create_group_and_event' %}" method="post">
+<form action="{% url 'maingame:create_group_and_event' %}" method="post">
   {% csrf_token %}
   <h2 class="col text-center">Start a Group</h2>
   <div class="form-group row align-items-center">

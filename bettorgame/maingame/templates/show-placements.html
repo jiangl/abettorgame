@@ -39,7 +39,7 @@
 
 <h4 class="bg-secondary text-white">Bets</h4>
 
-<form action="{% url 'create_placements' group_id event.id %}" method="post">
+<form action="{% url 'maingame:create_placements' group_id event.id %}" method="post">
   {% csrf_token %}
   {% for bet in bets_list %}
   <div class="container border">

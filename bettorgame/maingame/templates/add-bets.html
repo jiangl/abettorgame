@@ -47,7 +47,7 @@
 {% endfor %}
 
 </br>
-<form action="{% url 'create_bet' group_id event.id %}" method="post">
+<form action="{% url 'maingame:create_bet' group_id event.id %}" method="post">
   {% csrf_token %}
   <div class="form-group">
     <h4 class="bg-secondary text-white">Add New Bet</h4>

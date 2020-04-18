@@ -1,6 +1,6 @@
 {% include 'base-template.html' %}
 
-<form action="{% url 'login_user' %}" method="post">
+<form action="{% url 'maingame:login_user' %}" method="post">
   {% csrf_token %}
   <h2 class="col text-center">WELCOME BACK!</h2>
   <div class="form-group row align-items-center">
@@ -20,7 +20,7 @@
 </br>
 </br>
 
-<form action="{% url 'create_user' %}" method="post">
+<form action="{% url 'maingame:create_user' %}" method="post">
   {% csrf_token %}
   <h2 class="col text-center">NEW USER?</h2>
   <div class="form-group row align-items-center">

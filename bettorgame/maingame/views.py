@@ -190,16 +190,16 @@ def add_bets(request, group_id, event_id):
 
     #should this be moved to a method somewhere outside of this file so I can reuse?
     try:
-      bets_list = []
-      bets = Bet.objects.filter(
-        event=event_id
-        )
-      for bet in bets:
-        bets_list.append(
-          {
-          'bet': bet, 
-          'bet_options': BetOption.objects.filter(bet=bet).order_by('id')
-          })
+      bets_list = [
+      {
+      'bet': bet, 
+      'bet_options': BetOption.objects.filter(bet=bet).order_by('id')
+      } 
+      for bet in Bet.objects.filter(event=event_id)
+      ]
+
+
+
     except:
       bets_list = None
 
@@ -249,19 +249,17 @@ def show_placements(request, group_id, event_id):
       id=event_id
       )
 
-    pdb.set_trace()
-
     event_commissioner = UserEventRole.objects.get(
       role=1, event=event_id
       ).user
 
     # Same comment as in add_bets
+    # Still need to update to nested list comprehenseion
     try:
       bets_list = []
       bets = Bet.objects.filter(
         event=event_id
         )
-      number_of_bets = len(bets)
       for bet in bets:
         bet_options = BetOption.objects.filter(
           bet=bet
@@ -291,19 +289,18 @@ def show_placements(request, group_id, event_id):
           'bet': bet, 
           'bet_options': bet_options_and_names
           })
-    except:
-      bets_list = None
 
-
-    try:
+      # should this be updated to use list comprehension? or ternary operator?
       players_bets_placed = []
       players_bets_awaiting = []
       for player in event.players.all():
-        if len(Placement.objects.filter(player=player)) == number_of_bets:
+        if len(Placement.objects.filter(player=player)) == len(bets):
           players_bets_placed.append(player.first_name)
         else:
           players_bets_awaiting.append(player.first_name)
+
     except:
+      bets_list = None
       players_bets_placed = []
       players_bets_awaiting = []
 

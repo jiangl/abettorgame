@@ -1,7 +1,7 @@
 <!-- Redirect to add bets if not group admin -->
 {% include 'base-template.html' %}
 
-<form action="{% url 'set_stakes' group.id event.id %}" method="post">
+<form action="{% url 'maingame:set_stakes' group.id event.id %}" method="post">
   {% csrf_token %}
   <div class="form-group">
     <h4 class="bg-secondary text-white">Welcome Commissioner!</h4>
@@ -35,7 +35,7 @@
   <div class="row">
    <div class="col text-center">
     {% if not event_status.is_event_started %}
-    <form action="{% url 'start_event' group.id event.id %}" method="post">
+    <form action="{% url 'maingame:start_event' group.id event.id %}" method="post">
       {% csrf_token %}
       <button type="submit" class="btn btn-success">LOCK IN BETS!</button>
     </form>
@@ -45,7 +45,7 @@
     </div>
    <div class="col text-center">
     {% if not event_status.is_event_ended %}
-    <form action="{% url 'end_event' group.id event.id %}" method="post">
+    <form action="{% url 'maingame:end_event' group.id event.id %}" method="post">
       {% csrf_token %}
       <button type="submit" class="btn btn-danger">END GAME</button>
     </form>
