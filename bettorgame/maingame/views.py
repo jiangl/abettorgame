@@ -135,7 +135,7 @@ def set_stakes(request, group_id, event_id):
       )
     event.stakes = request.POST["setStakes"]
 
-    return HttpResponseRedirect(reverse('add_bets', args=(group_id,event.id,)))
+    return HttpResponseRedirect(reverse('add_bets', args=(group_id,event_id,)))
 
 def start_event(request, group_id, event_id):
     event = Event.objects.get(
@@ -143,7 +143,7 @@ def start_event(request, group_id, event_id):
       )
     event.start_time = datetime.datetime.now()
 
-    return HttpResponseRedirect(reverse('group_admin', args=(group_id,event.id,)))
+    return HttpResponseRedirect(reverse('group_admin', args=(group_id,event_id,)))
 
 def end_event(request, group_id, event_id):
     event = Event.objects.get(
@@ -152,7 +152,7 @@ def end_event(request, group_id, event_id):
 
     event.end_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
-    return HttpResponseRedirect(reverse('group_admin', args=(group_id,event.id,)))
+    return HttpResponseRedirect(reverse('group_admin', args=(group_id,event_id,)))
 
 def add_bets(request, group_id, event_id):
     event = Event.objects.get(
@@ -160,7 +160,7 @@ def add_bets(request, group_id, event_id):
       )
 
     event_commissioner = UserEventRole.objects.get(
-      role=1, event=event.id
+      role=1, event=event_id
       ).user.first_name
 
     player_first_names = [player.first_name for player in event.players.all()]
@@ -169,7 +169,7 @@ def add_bets(request, group_id, event_id):
     try:
       bets_list = []
       bets = Bet.objects.filter(
-        event=event.id
+        event=event_id
         )
       for bet in bets:
         bets_list.append({'bet': bet, 'bet_options': BetOption.objects.filter(bet=bet).order_by('id')})
@@ -186,7 +186,6 @@ def create_bet(request, group_id, event_id):
       id=request.user.id
       )
 
-    #should StatusType ID be 0? but there is no object with an ID of 0
     new_bet = Bet.objects.create(
       creator=creator, 
       event=event, 
@@ -207,7 +206,7 @@ def create_bet(request, group_id, event_id):
       text=request.POST['betOption2']
       )
 
-    return HttpResponseRedirect(reverse('add_bets', args=(group_id,event.id,)))
+    return HttpResponseRedirect(reverse('add_bets', args=(group_id,event_id,)))
 
 def show_placements(request, group_id, event_id):
     event = Event.objects.get(
@@ -217,14 +216,14 @@ def show_placements(request, group_id, event_id):
     pdb.set_trace()
 
     event_commissioner = UserEventRole.objects.get(
-      role=1, event=event.id
+      role=1, event=event_id
       ).user
 
     # Same comment as in add_bets
     try:
       bets_list = []
       bets = Bet.objects.filter(
-        event=event.id
+        event=event_id
         )
       number_of_bets = len(bets)
       for bet in bets:
@@ -290,7 +289,7 @@ def leaderboard(request, group_id, event_id):
       id=event_id
       )
     event_commissioner = UserEventRole.objects.get(
-      role=1, event=event.id
+      role=1, event=event_id
       ).user
 
     user = User.objects.get(
