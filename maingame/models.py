@@ -207,7 +207,7 @@ class EventResult(models.Model):
 
     def __str__(self):
         return "Bet: {}, {} {}: Score-{}, Rank-{}".format(
-            self.bet.question,
+            self.event.name,
             self.player.first_name,
             self.player.last_name,
             self.score,

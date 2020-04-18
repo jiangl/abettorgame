@@ -13,6 +13,7 @@ class BetResultInline(admin.TabularInline):
     model = BetResult
 
 class BetAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'creator', 'event', 'status', 'start_time', 'end_time')
     inlines = [
        BetOptionInline,
        PlacementInline,
@@ -26,6 +27,7 @@ class EventResultInline(admin.TabularInline):
     model = EventResult
 
 class EventAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'stakes', 'type', 'start_time', 'end_time')
     inlines = [
         UserEventRoleInline,
         EventResultInline
@@ -35,11 +37,13 @@ class UserGroupRoleInline(admin.TabularInline):
     model = UserGroupRole
 
 class GroupAdmin(admin.ModelAdmin):
+    list_display = ('__str__')
     inlines = [
         UserGroupRoleInline
     ]
 
 class UserAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'email', 'phone_number', 'join_date')
     inlines = [
         UserEventRoleInline,
         UserGroupRoleInline
