@@ -2,19 +2,19 @@ from django.db import models
 from .utils import db_defaults
 
 class EventType(models.Model):
-    name = models.TextField()
+    name = models.CharField(max_length=200)
 
     def __str__(self):
         return self.name
 
 class StatusType(models.Model):
-    name = models.TextField()
+    name = models.CharField(max_length=200)
 
     def __str__(self):
         return self.name
 
 class UserRole(models.Model):
-    name = models.TextField()
+    name = models.CharField(max_length=200)
 
     def __str__(self):
         return self.name
@@ -53,7 +53,7 @@ class Event(models.Model):
     players = models.ManyToManyField(User)
     groups = models.ManyToManyField(Group)
     name = models.CharField(max_length=200)
-    stakes = models.TextField()
+    stakes = models.CharField(max_length=200)
 
     def __str__(self):
         return self.name
@@ -115,7 +115,7 @@ class Bet(models.Model):
     )
     created_time = models.DateTimeField()
     start_time = models.DateTimeField()
-    question = models.TextField()
+    question = models.CharField(max_length=200)
     notes = models.TextField(blank=True)
     multiplier = models.FloatField(default=1)
     status = models.ForeignKey(
@@ -124,7 +124,10 @@ class Bet(models.Model):
         on_delete=models.SET_NULL
     )
 
-    outcome = models.TextField(blank=True)
+    outcome = models.CharField(
+        max_length=200,
+        blank=True
+    )
     end_time = models.DateTimeField(null=True)
 
     def __str__(self):
