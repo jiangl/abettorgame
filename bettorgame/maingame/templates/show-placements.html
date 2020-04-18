@@ -54,9 +54,13 @@
         </div>
     </div>
      <div class="row">
+      {% for bet_option in bet.bet_options %}
         <!-- should store the bet ID and answer ID somewhere in the div? -->
         <div class="col border bet-selection-div">
-          {{ bet.bet_options.0.text }}
+          {{ bet_option.bet_option.text }}
+          <div class="col text-center border-top">
+            {{ bet_option.player_first_names }}
+          </div>
           <!-- Need to add in logic about the bet still being live (no winner selected) or also don't show the SELECT WINNER options - and highlight outline of box with color based on win / loss and if game ended tie -->
           {% if event_status.is_event_started and not event_status.is_event_ended and is_admin %}
             <div class="col text-center">
@@ -64,14 +68,7 @@
             </div>
           {% endif %}
         </div>
-        <div class="col border bet-selection-div">
-          {{ bet.bet_options.1.text }}
-          {% if event_status.is_event_started and not event_status.is_event_ended and is_admin %}
-            <div class="col text-center">
-              <button type="submit" class="btn btn-primary">SELECT WINNER</button>
-            </div>
-          {% endif %}
-        </div>
+      {% endfor %}
     </div>
   </div>
   </span>

@@ -1,5 +1,4 @@
 from django.shortcuts import render
-<<<<<<< HEAD
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .models import User, Group, Event, UserGroupRole, UserEventRole, Bet, BetOption, Placement, EventResult, BetResult, EventType, StatusType, UserRole
@@ -69,9 +68,6 @@ def join_group_and_event(request):
         # Redisplay the question voting form.
         return render(request, 'index.html', {'error_message': "There is no Group with that code."})
     else:
-      #connect user to group/event
-      request.session['is_admin'] = "ADMIN" == UserEventRole.objects.get(user=request.user.id, event=event.id)
-
       return HttpResponseRedirect(reverse('add_bets', args=[group.id, event.id]))
 
 def create_group_and_event(request):
@@ -80,8 +76,9 @@ def create_group_and_event(request):
 
     placeholder_future_start_date = datetime.datetime.now().replace(tzinfo=pytz.UTC) + datetime.timedelta(days=365)
     placeholder_future_end_date = placeholder_future_start_date + datetime.timedelta(days=7)
+    placeholder_stakes = 'TBD'
 
-    new_event = Event(start_time=placeholder_future_start_date, end_time=placeholder_future_end_date, name=new_group.name)
+    new_event = Event(start_time=placeholder_future_start_date, end_time=placeholder_future_end_date, name=new_group.name, stakes=placeholder_stakes)
     new_event.save()
 
     user = User.objects.get(id=request.user.id)
@@ -114,9 +111,8 @@ def group_admin(request, group_id, event_id):
 
 def set_stakes(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
-    # NEED TO UPDATE MODEL TO HAVE STAKES ON EVENT
-    # stakes = request.POST["setStakes"]
-    # event.stakes = stakes
+    event.stakes = request.POST["setStakes"]
+
     return HttpResponseRedirect(reverse('add_bets', args=(group_id,event.id,)))
 
 def start_event(request, group_id, event_id):
@@ -153,9 +149,8 @@ def add_bets(request, group_id, event_id):
 def create_bet(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     creator = User.objects.get(id=request.user.id)
-    #remove stakes, outcome once db updated
+
     #should StatusType ID be 0? but there is no object with an ID of 0
-    #update timing for start and end
     new_bet = Bet(creator=creator, event=event, created_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), start_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), end_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), question=request.POST['betQuestion'], status=StatusType.objects.get(id=1))
     new_bet.save()
 
@@ -178,7 +173,17 @@ def show_placements(request, group_id, event_id):
       bets = Bet.objects.filter(event=event.id)
       number_of_bets = len(bets)
       for bet in bets:
-        bets_list.append({'bet': bet, 'bet_options': BetOption.objects.filter(bet=bet).order_by('id')})
+        bet_options = BetOption.objects.filter(bet=bet).order_by('id')
+        bet_options_and_names = []
+        for bet_option in bet_options:
+          #how to make this check option or custom option depending on the bet?
+          bet_option_placements = Placement.objects.filter(bet=bet, option=bet_option)
+          if bet_option_placements:
+            player_first_names = ', '.join([bet_option.player.first_name for bet_option in bet_option_placements])
+            bet_options_and_names.append({'bet_option': bet_option, 'player_first_names': player_first_names})
+          else:
+            bet_options_and_names.append({'bet_option': bet_option, 'player_first_names': ''})
+        bets_list.append({'bet': bet, 'bet_options': bet_options_and_names})
     except:
       bets_list = None
 
@@ -202,6 +207,7 @@ def show_placements(request, group_id, event_id):
     is_event_ended = event.end_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
     event_status = {'is_event_started': is_event_started, 'is_event_ended': is_event_ended}
 
+    #replace below logic with authentication and logic in view
     is_admin = event_commissioner.id == request.user.id
 
     return render(request, 'show-placements.html', {'event': event, 'group_id': group_id, 'event_commissioner': event_commissioner, 'bets_list': bets_list, 'players_bets_placed': players_bets_placed, 'players_bets_awaiting': players_bets_awaiting, 'event_status': event_status, 'is_admin': is_admin})

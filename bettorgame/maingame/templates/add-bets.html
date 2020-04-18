@@ -35,12 +35,11 @@
       </div>
   </div>
    <div class="row">
+    {% for bet_option in bet.bet_options %}
       <div class="col border">
-        {{ bet.bet_options.0.text }}
+        {{ bet_option.text }}
       </div>
-      <div class="col border">
-        {{ bet.bet_options.1.text }}
-      </div>
+    {% endfor %}
   </div>
 </div>
 </span>
