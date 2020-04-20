@@ -2,10 +2,14 @@
 
 <div class="container border border-white p-5">
   <h2 class="col text-center p-3">Join a Group</h2>
-  <form>
+  <form action="{% url 'maingame:join_group_and_event' %}" method="post">
+    {% csrf_token %}
     <div class="form-group">
-      <label for="inputGroupId">Enter Invite Code</label>
-      <input type="groupId" class="form-control" id="inputGroupId" placeholder="123-456">
+      <label for="inputEventId">Enter Invite Code</label>
+      {% if error_message %}
+        <label class="col"><p><strong>{{ error_message }}</strong></p></label>
+      {% endif %}
+      <input type="groupAndEventId" class="form-control" id="inputGroupAndEventId" name="groupAndEventId" placeholder="123-456" required>
     </div>
     <button type="submit" class="btn btn-primary">JOIN GROUP</button>
   </form>
@@ -13,10 +17,11 @@
 
 <div class="container border border-white p-5">
   <h2 class="col text-center p-3">Start a Group</h2>
-  <form>
+  <form action="{% url 'maingame:create_group_and_event' %}" method="post">
+    {% csrf_token %}
     <div class="form-group">
       <label for="inputGroupName">Enter Group Name</label>
-      <input type="groupName" class="form-control" id="inputGroupName" placeholder="Greater Wynnewood Exotic Animal Park">
+      <input type="groupName" class="form-control" id="inputGroupName" name="groupName" placeholder="Greater Wynnewood Exotic Animal Park" required>
     </div>
     <button type="submit" class="btn btn-primary">CREATE GROUP</button>
   </form>
