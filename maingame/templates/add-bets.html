@@ -1,19 +1,18 @@
 {% include 'base-template.html' %}
 
-<!-- pass group object (per db contains name and particpatns) -->
-<h2 class="col text-center">{{ group.name }}</h2>
-<h6 class="col text-center">Group ID: {{ group.id }}</h6>
-<h6 class="col text-center">Commissioner: {{ group.admin }}</h6>
-<h6 class="col text-center">Stakes: {{ group.stakes }}</h6>
+<h2 class="col text-center">{{ event.name }}</h2>
+<h6 class="col text-center">Group ID: {{ group_id }}-{{ event.id }}</h6>
+<h6 class="col text-center">Commissioner: {{ event_commissioner }}</h6>
+<h6 class="col text-center">Stakes: {{ event.stakes }}</h6>
 
 </br>
 
 <h4 class="bg-secondary text-white">Participants</h4>
 <div class="container">
   <div class="row">
-    {% for participant in group.participants %}
+    {% for first_name in player_first_names %}
       <div class="col-3">
-        {{ participant }}
+        {{ first_name }}
       </div>
     {% endfor %}
   </div>
@@ -23,25 +22,24 @@
 </br>
 
 <h4 class="bg-secondary text-white">Current Bets</h4>
-{% for bet in group.bets %}
+{% for bet in bets_list %}
 <div class="container border">
   <div class="row">
       <div class="col font-weight-bold">
-        {{ bet.bet }}
+        {{ bet.bet.question }}
       </div>
   </div>
   <div class="row">
       <div class="col font-italic">
-        Creator: {{ bet.creator }}
+        Creator: {{ bet.bet.creator.first_name }}
       </div>
   </div>
    <div class="row">
+    {% for bet_option in bet.bet_options %}
       <div class="col border">
-        {{ bet.option_1 }}
+        {{ bet_option.text }}
       </div>
-      <div class="col border">
-        {{ bet.option_2 }}
-      </div>
+    {% endfor %}
   </div>
 </div>
 </span>
@@ -49,17 +47,18 @@
 {% endfor %}
 
 </br>
-<form>
+<form action="{% url 'maingame:create_bet' group_id event.id %}" method="post">
+  {% csrf_token %}
   <div class="form-group">
     <h4 class="bg-secondary text-white">Add New Bet</h4>
-    <input type="text" class="form-control" id="formAddBetExampleInput" placeholder="Is the DJ going to play Wagon Wheel?">
+    <input type="text" class="form-control" id="formAddBetExampleInput" name="betQuestion" placeholder="Is the DJ going to play Wagon Wheel?" required>
   </div>
   <div class="row">
     <div class="col">
-      <input type="text" class="form-control" placeholder="100% Yes">
+      <input type="text" class="form-control" name="betOption1" placeholder="100% Yes" required>
     </div>
     <div class="col">
-      <input type="text" class="form-control" placeholder="No Chance">
+      <input type="text" class="form-control" name="betOption2" placeholder="No Chance" required>
     </div>
   </div>
 </br>

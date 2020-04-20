@@ -1,33 +1,57 @@
 <!-- Redirect to add bets if not group admin -->
 {% include 'base-template.html' %}
 
-<form>
+<form action="{% url 'maingame:set_stakes' group.id event.id %}" method="post">
+  {% csrf_token %}
   <div class="form-group">
     <h4 class="bg-secondary text-white">Welcome Commissioner!</h4>
     <h5>What are the stakes?</h5>
-    <input type="text" class="form-control" id="formSetStakesExampleInput" placeholder="$20, Everyone buys the winner a beer, etc.">
+    {% if not event_status.is_event_started %}
+    <input type="text" class="form-control" id="formSetStakesExampleInput" name="setStakes" placeholder="$20, Everyone buys the winner a beer, etc." required>
+    {% else %}
+    <input class="form-control" type="text" placeholder="{{ event.stakes }}" readonly>
+    {% endif %}
   </div>
   <div class="col text-center">
-    <button type="submit" class="btn btn-primary">SUBMIT STAKES</button>
+    {% if not event_status.is_event_started %}
+    <button type="submit" class="btn btn-primary">SUBMIT STAKES AND START ADDING BETS</button>
+    {% else %}
+    <button type="submit" class="btn btn-secondary disabled" aria-disabled="true">STAKES ARE SET</button>
+    {% endif %}
   </div>
+
 </form>
 
 </br>
 
 <h3 class="col text-center">Invite friends to join your group!</h3>
-<h6 class="col text-center">Group ID: {{ group.id }}</h6>
+<h6 class="col text-center">Group ID: {{ event.id }}</h6>
 
 </br>
 
-<h5 class="col text-center">As the commissioner, you have special powers and responsibilities. When all members of the group have submitted their picks, come back here and hit the "START GAME!" button to lock all bets in place.<p></br>On the "Make Bets" page, you have the ability to select the winning option when an individual bet is complete.<p></br>When the game is over, come back here and hit "END GAME". Any bets that do not have a winning option selected will result in a push (tie) for that bet.</h5>
+<h5 class="col text-center">As the commissioner, you have special powers and responsibilities. When all members of the group have submitted their picks, come back here and hit the "LOCK IN BETS!" button to lock all bets in place.<p></br>On the "Make Bets" page, you have the ability to select the winning option when an individual bet is complete.<p></br>When the game is over, come back here and hit "END GAME". Any bets that do not have a winning option selected will result in a push (tie) for that bet.</h5>
 
 <div class="container">
   <div class="row">
    <div class="col text-center">
-      <button type="submit" class="btn btn-success">START GAME!</button>
+    {% if not event_status.is_event_started %}
+    <form action="{% url 'maingame:start_event' group.id event.id %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-success">LOCK IN BETS!</button>
+    </form>
+    {% else %}
+      <button class="btn btn-secondary disabled" role="button" aria-disabled="true">BETS LOCKED IN!</button>
+    {% endif %}
     </div>
    <div class="col text-center">
+    {% if not event_status.is_event_ended %}
+    <form action="{% url 'maingame:end_event' group.id event.id %}" method="post">
+      {% csrf_token %}
       <button type="submit" class="btn btn-danger">END GAME</button>
+    </form>
+    {% else %}
+      <button class="btn btn-secondary disabled" role="button" aria-disabled="true">GAME IS OVER!</button>
+    {% endif %}
     </div>
   </div>
 </div>
