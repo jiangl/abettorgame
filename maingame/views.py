@@ -349,7 +349,8 @@ def leaderboard(request, group_id, event_id):
       id=event_id
       )
     event_commissioner = UserEventRole.objects.get(
-      role=1, event=event_id
+      role=1, 
+      event=event_id
       ).user
 
     user = User.objects.get(
