@@ -37,7 +37,7 @@ class UserGroupRoleInline(admin.TabularInline):
     model = UserGroupRole
 
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ('__str__')
+    list_display = ('__str__',)
     inlines = [
         UserGroupRoleInline
     ]
