@@ -19,9 +19,8 @@ def login_user(request):
     #Lisa will be updating authetntication
     try:
       email = request.POST["loginEmail"]
-      existing_user = User.objects.get(
-        email=email
-        )
+      existing_user = User.objects.get(email=email)
+
       if existing_user:
         request.session['is_authenticated'] = True
 
@@ -39,9 +38,7 @@ def login_user(request):
 
 def create_user(request):
     email = request.POST["createEmail"]
-    existing_user = User.objects.filter(
-      email=email
-      )
+    existing_user = User.objects.filter(email=email)
     
     if existing_user:
       return render(
@@ -61,7 +58,7 @@ def create_user(request):
         email=email
         )
 
-      return HttpResponseRedirect(reverse('index'))
+      return HttpResponseRedirect(reverse('maingame:index'))
 
 def index(request):
 
@@ -70,14 +67,10 @@ def index(request):
 def join_group_and_event(request):
     try:
       groupAndEventIdArray = request.POST["groupAndEventId"].split('-')
-      group = Group.objects.get(
-        id=groupAndEventIdArray[0]
-        )
-      event = Event.objects.get(
-        id=groupAndEventIdArray[1]
-        )
+      group = Group.objects.get(id=groupAndEventIdArray[0])
+      event = Event.objects.get(id=groupAndEventIdArray[1])
 
-      return HttpResponseRedirect(reverse('add_bets', args=[group.id, event.id]))
+      return HttpResponseRedirect(reverse('maingame:add_bets', args=[group.id, event.id]))
 
     except:
         # Redisplay the question voting form.
@@ -89,9 +82,7 @@ def join_group_and_event(request):
           })
 
 def create_group_and_event(request):
-    new_group = Group.objects.create(
-      name=request.POST["groupName"]
-      )
+    new_group = Group.objects.create(name=request.POST["groupName"])
 
     placeholder_future_start_date = datetime.datetime.now().replace(tzinfo=pytz.UTC) + datetime.timedelta(days=365)
     placeholder_future_end_date = placeholder_future_start_date + datetime.timedelta(days=7)
@@ -104,15 +95,13 @@ def create_group_and_event(request):
       stakes=placeholder_stakes
       )
 
-    user = User.objects.get(
-      id=request.user.id
-      )
+    user = User.objects.get(id=request.user.id)
 
     new_group.players.add(user)
     new_event.players.add(user)
     new_event.groups.add(new_group)
 
-    role_admin = UserRole.objects.get(id=1)
+    role_admin = UserRole.objects.get(id=2)
 
     UserGroupRole.objects.create(
       user=user, 
@@ -126,67 +115,51 @@ def create_group_and_event(request):
       role=role_admin
       )
 
-    return HttpResponseRedirect(reverse('group_admin', args=[new_group.id, new_event.id]))
+    return HttpResponseRedirect(reverse('maingame:group_admin', args=[new_group.id, new_event.id]))
 
 def group_admin(request, group_id, event_id):
-    event = Event.objects.get(
-      id=event_id
-      )
-    group = Group.objects.get(
-      id=group_id
-      )
+    event = Event.objects.get(id=event_id)
 
     is_event_started = event.start_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
     is_event_ended = event.end_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
-    event_status = {
-    'is_event_started': is_event_started, 
-    'is_event_ended': is_event_ended
-    }
 
     return render(
       request, 
       'group-admin.html', 
       {
       'event': event, 
-      'group': group, 
-      'event_status': event_status
+      'group_id': group_id, 
+      'is_event_started': is_event_started,
+      'is_event_ended': is_event_ended
       })
 
 def set_stakes(request, group_id, event_id):
-    event = Event.objects.get(
-      id=event_id
-      )
+    event = Event.objects.get(id=event_id)
     event.stakes = request.POST["setStakes"]
 
-    return HttpResponseRedirect(reverse('add_bets', args=(group_id,event_id,)))
+    return HttpResponseRedirect(reverse('maingame:add_bets', args=(group_id,event_id,)))
 
 def start_event(request, group_id, event_id):
-    event = Event.objects.get(
-      id=event_id
-      )
-    event.start_time = datetime.datetime.now()
+    event = Event.objects.get(id=event_id)
+    event.start_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
-    return HttpResponseRedirect(reverse('group_admin', args=(group_id,event_id,)))
+    return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id,event_id,)))
 
 def end_event(request, group_id, event_id):
-    event = Event.objects.get(
-      id=event_id
-      )
-
+    event = Event.objects.get(id=event_id)
     event.end_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
-    return HttpResponseRedirect(reverse('group_admin', args=(group_id,event_id,)))
+    return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id,event_id,)))
 
 def add_bets(request, group_id, event_id):
-    event = Event.objects.get(
-      id=event_id
-      )
+    event = Event.objects.get(id=event_id)
 
     event_commissioner = UserEventRole.objects.get(
-      role=1, event=event_id
+      role=2, 
+      event=event_id
       ).user.first_name
 
-    player_first_names = [player.first_name for player in event.players.all()]
+    player_names = [str(player).strip() for player in event.players.all()]
 
     #should this be moved to a method somewhere outside of this file so I can reuse?
     try:
@@ -195,10 +168,8 @@ def add_bets(request, group_id, event_id):
       'bet': bet, 
       'bet_options': BetOption.objects.filter(bet=bet).order_by('id')
       } 
-      for bet in Bet.objects.filter(event=event_id)
+      for bet in Bet.objects.filter(event=event_id).order_by('id')
       ]
-
-
 
     except:
       bets_list = None
@@ -209,18 +180,15 @@ def add_bets(request, group_id, event_id):
       {
       'event': event, 
       'group_id': group_id, 
-      'player_first_names': player_first_names, 
+      'player_names': player_names, 
       'event_commissioner': event_commissioner, 
       'bets_list': bets_list
       })
 
 def create_bet(request, group_id, event_id):
-    event = Event.objects.get(
-      id=event_id
-      )
-    creator = User.objects.get(
-      id=request.user.id
-      )
+    event = Event.objects.get(id=event_id)
+
+    creator = User.objects.get(id=request.user.id)
 
     new_bet = Bet.objects.create(
       creator=creator, 
@@ -242,28 +210,24 @@ def create_bet(request, group_id, event_id):
       text=request.POST['betOption2']
       )
 
-    return HttpResponseRedirect(reverse('add_bets', args=(group_id,event_id,)))
+    return HttpResponseRedirect(reverse('maingame:add_bets', args=(group_id,event_id,)))
 
 def show_placements(request, group_id, event_id):
-    event = Event.objects.get(
-      id=event_id
-      )
+    event = Event.objects.get(id=event_id)
 
     event_commissioner = UserEventRole.objects.get(
-      role=1, event=event_id
+      role=2, 
+      event=event_id
       ).user
 
     # Same comment as in add_bets
     # Still need to update to nested list comprehenseion
     try:
       bets_list = []
-      bets = Bet.objects.filter(
-        event=event_id
-        )
+      bets = Bet.objects.filter(event=event_id)
+
       for bet in bets:
-        bet_options = BetOption.objects.filter(
-          bet=bet
-          ).order_by('id')
+        bet_options = BetOption.objects.filter(bet=bet).order_by('id')
         bet_options_and_names = []
         for bet_option in bet_options:
           #how to make this check option or custom option depending on the bet?
@@ -309,10 +273,6 @@ def show_placements(request, group_id, event_id):
     #this is reused code from above - move out into a function?
     is_event_started = event.start_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
     is_event_ended = event.end_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
-    event_status = {
-    'is_event_started': is_event_started, 
-    'is_event_ended': is_event_ended
-    }
 
     #replace below logic with authentication and logic in view
     is_admin = event_commissioner.id == request.user.id
@@ -327,34 +287,28 @@ def show_placements(request, group_id, event_id):
       'bets_list': bets_list, 
       'players_bets_placed': players_bets_placed, 
       'players_bets_awaiting': players_bets_awaiting, 
-      'event_status': event_status, 
+      'is_event_started': is_event_started,
+      'is_event_ended': is_event_ended,
       'is_admin': is_admin
       })
 
 def create_placements(request, group_id, event_id):
-    event = Event.objects.get(
-      id=event_id
-      )
-    user = User.objects.get(
-      id=request.user.id
-      )
+    event = Event.objects.get(id=event_id)
+    user = User.objects.get(id=request.user.id)
 
     # need all the logic here - struggling with the JS working
 
 
-    return HttpResponseRedirect(reverse('show_placements', args=(group_id,event_id,)))
+    return HttpResponseRedirect(reverse('maingame:show_placements', args=(group_id,event_id,)))
 
 def leaderboard(request, group_id, event_id):
-    event = Event.objects.get(
-      id=event_id
-      )
+    event = Event.objects.get(id=event_id)
     event_commissioner = UserEventRole.objects.get(
-      role=1, event=event_id
+      role=2, 
+      event=event_id
       ).user
 
-    user = User.objects.get(
-      id=request.user.id
-      )
+    user = User.objects.get(id=request.user.id)
 
 
     return render(

@@ -1,8 +1,9 @@
 {% include 'base-template.html' %}
 <!-- JS Functions -->
-{% if event_status is defined and not event_status.is_event_started %}
+<!-- Needs to be fixed -->
+<!-- {% if not is_event_started %}
   {% include 'js/bet_handlers.js' %}
-{% endif %}
+{% endif %} -->
 
 <h2 class="col text-center">{{ event.name }}</h2>
 <h6 class="col text-center">Group ID: {{ group_id }}-{{ event.id }}</h6>
