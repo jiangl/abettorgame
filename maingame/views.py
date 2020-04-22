@@ -127,9 +127,6 @@ def end_event(request, group_id, event_id):
 @login_required
 def add_bets(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
-
-    import pdb
-    pdb.set_trace()
     event_commissioner = UserEventRole.objects.get(
       role=UserRoles.ADMIN.value, 
       event=event_id
@@ -174,7 +171,7 @@ def create_bet(request, group_id, event_id):
       start_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), 
       end_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), 
       question=request.POST['betQuestion'], 
-      status_id=1
+      status_id=StatusType.PENDING.value
       )
 
     BetOption.objects.create(
