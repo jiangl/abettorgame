@@ -128,12 +128,14 @@ def end_event(request, group_id, event_id):
 def add_bets(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
 
+    import pdb
+    pdb.set_trace()
     event_commissioner = UserEventRole.objects.get(
-      role=2, 
+      role=UserRoles.ADMIN.value, 
       event=event_id
       ).user.first_name
 
-    player_names = [str(player).strip() for player in event.players.all()]
+    player_names = [player.first_name for player in event.players.all()]
 
     #should this be moved to a method somewhere outside of this file so I can reuse?
     try:
@@ -294,7 +296,7 @@ def leaderboard(request, group_id, event_id):
       event=event_id
       ).user
 
-    user_full_name = str(User.objects.get(id=request.user.id)).strip()
+    user_first_name = User.objects.get(id=request.user.id).first_name
 
     bets = Bet.objects.filter(event=event_id)
     number_bets_remaining = len([bet for bet in bets if bet.status.name in ['INITIATED', 'PENDING']])
@@ -305,7 +307,7 @@ def leaderboard(request, group_id, event_id):
     for player in event.players.all():
         event_result = EventResult.objects.get(player=player, event=event_id)
 
-        bet_results_dict[str(player).strip()] = {
+        bet_results_dict[player.first_name] = {
             'rank': event_result.rank or 1,
             'score': event_result.score or 0, 
             'won': 0, 
@@ -317,7 +319,7 @@ def leaderboard(request, group_id, event_id):
     bets_completed = [BetResult.objects.filter(bet=bet) for bet in bets if bet.status.name == 'COMPLETED']
     
     for bet in bets_completed:
-        player = str(bet.player).strip()
+        player = bet.player.first_name
         if bet.score:
             bet_results_dict[player.won] += 1
         else:
@@ -331,5 +333,5 @@ def leaderboard(request, group_id, event_id):
       'group_id': group_id, 
       'event_commissioner': event_commissioner,
       'bet_results_dict': bet_results_dict,
-      'user_best_result_dict': bet_results_dict[user_full_name]
+      'user_best_result_dict': bet_results_dict[user_first_name]
       })
