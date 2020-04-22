@@ -5,14 +5,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Stylesheets -->
-    {% block css %}
+    {% block staticfiles %}
+      {% load static %}
       <!-- Bootstrap CSS -->
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
       <!-- Custom CSS -->
-      {% load static %}
-      <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+      <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     {% endblock %}
+
+    {% load auth_extras %}
 
   </head>
   <body>
@@ -31,16 +32,21 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          {% if group_id and event %}
-            <a class="nav-item nav-link active" href="{% url 'maingame:add_bets' group_id event.id %}">Add Bets <span class="sr-only">(current)</span></a>
-            <a class="nav-item nav-link" href="{% url 'maingame:show_placements' group_id event.id %}">Make Bets</a>
-            <a class="nav-item nav-link" href="{% url 'maingame:leaderboard' group_id event.id %}">Leaderboard</a>
+          {% if user.is_authenticated %}
+            {% if group_id and event %}
+              <a class="nav-item nav-link active" href="{% url 'maingame:add_bets' group_id event.id %}">Add Bets <span class="sr-only">(current)</span></a>
+              <a class="nav-item nav-link" href="{% url 'maingame:show_placements' group_id event.id %}">Make Bets</a>
+              <a class="nav-item nav-link" href="{% url 'maingame:leaderboard' group_id event.id %}">Leaderboard</a>
+            {% endif %}
+            {% if user|admin_group:group_id %}
+              <a class="nav-item nav-link" href="{% url 'maingame:group_admin' group_id event.id %}">ADMIN</a>
+            {% endif %}
+            <a class="nav-item nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a>
+          {% else %}
+            <a class="nav-item nav-link" href="{% url 'login'%}?next={{request.path}}">Login</a>
+            <a class="nav-item nav-link" href="{% url 'maingame:signup'%}?next={{request.path}}">Signup</a>
           {% endif %}
-          <a class="nav-item nav-link" href="{% url 'maingame:login' %}">Log out</a>
-          <!-- Need to add authorization logic for admin -->
-          {% if group_id and event %}
-            <a class="nav-item nav-link" href="{% url 'maingame:group_admin' group_id event.id %}">ADMIN</a>
-          {% endif %}
+
         </div>
       </div>
     </nav>

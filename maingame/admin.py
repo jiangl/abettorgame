@@ -1,5 +1,5 @@
 from django.contrib import admin
-from maingame.models import User, Group, Event, UserGroupRole, UserEventRole, Bet, BetOption, Placement, EventResult, BetResult, EventType, StatusType, UserRole
+from maingame.models import Group, Event, UserGroupRole, UserEventRole, Bet, BetOption, Placement, EventResult, BetResult, EventType, StatusType, UserRole
 
 # Model groups
 class BetOptionInline(admin.TabularInline):
@@ -35,6 +35,7 @@ class EventAdmin(admin.ModelAdmin):
 
 class UserGroupRoleInline(admin.TabularInline):
     model = UserGroupRole
+    extra = 0
 
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('__str__',)
@@ -67,7 +68,6 @@ class EventTypeAdmin(admin.ModelAdmin):
 
 # Register models
 admin.site.register(UserRole)
-admin.site.register(User, UserAdmin)
 admin.site.register(Bet, BetAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Event, EventAdmin)
