@@ -1,5 +1,6 @@
 from django.db import models
 from .utils import db_defaults
+from django.contrib.auth.models import User
 
 class EventType(models.Model):
     name = models.CharField(max_length=200)
@@ -18,22 +19,6 @@ class UserRole(models.Model):
 
     def __str__(self):
         return self.name
-
-class User(models.Model):
-    first_name = models.CharField(max_length=200)
-    last_name = models.CharField(
-        max_length=200,
-        blank=True
-    )
-    join_date = models.DateTimeField()
-    email = models.CharField(max_length=200)
-    phone_number = models.IntegerField(
-        null=True,
-        blank=True
-    )
-
-    def __str__(self):
-        return "{} {}".format(self.first_name, self.last_name)
 
 class Group(models.Model):
     players = models.ManyToManyField(User)
