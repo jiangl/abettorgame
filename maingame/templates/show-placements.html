@@ -1,9 +1,7 @@
 {% include 'base-template.html' %}
-<!-- JS Functions -->
-<!-- Needs to be fixed -->
-<!-- {% if not is_event_started %}
-  {% include 'js/bet_handlers.js' %}
-{% endif %} -->
+{% load static %}
+<script src="{% static 'js/bet_handlers.js' %}"></script>
+
 
 <h2 class="col text-center">{{ event.name }}</h2>
 <h6 class="col text-center">Group ID: {{ group_id }}-{{ event.id }}</h6>
@@ -79,3 +77,5 @@
     <button type="submit" class="btn btn-primary">LOCK IN BETS</button>
   </div>
 </form>
+
+
