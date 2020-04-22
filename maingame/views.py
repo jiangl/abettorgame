@@ -301,8 +301,6 @@ def create_placements(request, group_id, event_id):
     request_data = request.POST.dict()
 
     for bet, option in request_data.items():
-        print(bet)
-        print(option)
         if str(bet) != 'csrfmiddlewaretoken':
             Placement.objects.create(
                 player = User.objects.get(id=request.user.id),
