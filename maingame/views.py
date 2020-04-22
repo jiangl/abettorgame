@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .models import User, Group, Event, UserGroupRole, UserEventRole, Bet, BetOption, Placement, EventResult, BetResult, EventType, StatusType, UserRole
+from maingame.utils.enums import StatusType, EventType, UserRoles
 from django.contrib import messages
 import datetime
 import pytz
@@ -86,7 +87,7 @@ def create_group_and_event(request):
 
     placeholder_future_start_date = datetime.datetime.now().replace(tzinfo=pytz.UTC) + datetime.timedelta(days=365)
     placeholder_future_end_date = placeholder_future_start_date + datetime.timedelta(days=7)
-    placeholder_stakes = 'TBD'
+    placeholder_stakes = '$20, Everyone buys the winner a beer, etc.'
 
     new_event = Event.objects.create(
       start_time=placeholder_future_start_date, 
@@ -101,7 +102,7 @@ def create_group_and_event(request):
     new_event.players.add(user)
     new_event.groups.add(new_group)
 
-    role_admin = UserRole.objects.get(id=2)
+    role_admin = UserRole.objects.get(id=UserRoles.ADMIN.value)
 
     UserGroupRole.objects.create(
       user=user, 
@@ -136,28 +137,31 @@ def group_admin(request, group_id, event_id):
 def set_stakes(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.stakes = request.POST["setStakes"]
+    event.save()
 
     return HttpResponseRedirect(reverse('maingame:add_bets', args=(group_id,event_id,)))
 
 def start_event(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.start_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
+    event.save()
 
     return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id,event_id,)))
 
 def end_event(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.end_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
+    event.save()
 
     return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id,event_id,)))
 
 def add_bets(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
 
-    event_commissioner = UserEventRole.objects.get(
-      role=2, 
+    event_commissioner = str(UserEventRole.objects.get(
+      role=UserRoles.ADMIN.value, 
       event=event_id
-      ).user.first_name
+      ).user).strip()
 
     player_names = [str(player).strip() for player in event.players.all()]
 
@@ -197,7 +201,7 @@ def create_bet(request, group_id, event_id):
       start_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), 
       end_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), 
       question=request.POST['betQuestion'], 
-      status=StatusType.objects.get(id=1)
+      status=StatusType.objects.get(id=StatusType.PENDING.value)
       )
 
     BetOption.objects.create(
@@ -215,10 +219,10 @@ def create_bet(request, group_id, event_id):
 def show_placements(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
 
-    event_commissioner = UserEventRole.objects.get(
-      role=2, 
+    event_commissioner = str(UserEventRole.objects.get(
+      role=UserRoles.ADMIN.value, 
       event=event_id
-      ).user
+      ).user).strip()
 
     # Same comment as in add_bets
     # Still need to update to nested list comprehenseion
@@ -275,7 +279,7 @@ def show_placements(request, group_id, event_id):
     is_event_ended = event.end_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
     #replace below logic with authentication and logic in view
-    is_admin = event_commissioner.id == request.user.id
+    is_admin = False
 
     return render(
       request, 
@@ -303,13 +307,39 @@ def create_placements(request, group_id, event_id):
 
 def leaderboard(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
-    event_commissioner = UserEventRole.objects.get(
-      role=2, 
+    event_commissioner = str(UserEventRole.objects.get(
+      role=UserRoles.ADMIN.value, 
       event=event_id
-      ).user
+      ).user).strip()
 
-    user = User.objects.get(id=request.user.id)
+    user_full_name = str(User.objects.get(id=request.user.id)).strip()
 
+    bets = Bet.objects.filter(event=event_id)
+    number_bets_remaining = len([bet for bet in bets if bet.status.name in ['INITIATED', 'PENDING']])
+
+    # load leaderboard empty stats before game started / first bet finished
+    # is there a better way to save this data rather than recalculating from 0 each time?
+    bet_results_dict = {}
+    for player in event.players.all():
+        event_result = EventResult.objects.get(player=player, event=event_id)
+
+        bet_results_dict[str(player).strip()] = {
+            'rank': event_result.rank or 1,
+            'score': event_result.score or 0, 
+            'won': 0, 
+            'lost': 0, 
+            'remaining': number_bets_remaining
+        }
+
+    # For all completed bets, find the BetResult to count the W/L by player
+    bets_completed = [BetResult.objects.filter(bet=bet) for bet in bets if bet.status.name == 'COMPLETED']
+    
+    for bet in bets_completed:
+        player = str(bet.player).strip()
+        if bet.score:
+            bet_results_dict[player.won] += 1
+        else:
+            bet_results_dict[player.lost] += 1
 
     return render(
       request, 
@@ -317,5 +347,7 @@ def leaderboard(request, group_id, event_id):
       {
       'event': event, 
       'group_id': group_id, 
-      'event_commissioner': event_commissioner
+      'event_commissioner': event_commissioner,
+      'bet_results_dict': bet_results_dict,
+      'user_best_result_dict': bet_results_dict[user_full_name]
       })
