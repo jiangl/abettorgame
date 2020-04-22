@@ -220,6 +220,8 @@ def show_placements(request, group_id, event_id):
       event=event_id
       ).user
 
+    current_user_firstname = request.user.first_name
+
     # Same comment as in add_bets
     # Still need to update to nested list comprehenseion
     try:
@@ -229,6 +231,7 @@ def show_placements(request, group_id, event_id):
       for bet in bets:
         bet_options = BetOption.objects.filter(bet=bet).order_by('id')
         bet_options_and_names = []
+
         for bet_option in bet_options:
           #how to make this check option or custom option depending on the bet?
           bet_option_placements = Placement.objects.filter(
@@ -237,10 +240,12 @@ def show_placements(request, group_id, event_id):
             )
           if bet_option_placements:
             player_first_names = ', '.join([bet_option.player.first_name for bet_option in bet_option_placements])
+            selected = current_user_firstname in player_first_names
             bet_options_and_names.append(
               {
               'bet_option': bet_option, 
-              'player_first_names': player_first_names
+              'player_first_names': player_first_names,
+              'selected': selected
               })
           else:
             bet_options_and_names.append(
@@ -251,7 +256,7 @@ def show_placements(request, group_id, event_id):
         bets_list.append(
           {
           'bet': bet, 
-          'bet_options': bet_options_and_names
+          'bet_options': bet_options_and_names,
           })
 
       # should this be updated to use list comprehension? or ternary operator?
@@ -293,13 +298,19 @@ def show_placements(request, group_id, event_id):
       })
 
 def create_placements(request, group_id, event_id):
-    event = Event.objects.get(id=event_id)
-    user = User.objects.get(id=request.user.id)
+    request_data = request.POST.dict()
 
-    # need all the logic here - struggling with the JS working
+    for bet, option in request_data.items():
+        print(bet)
+        print(option)
+        if str(bet) != 'csrfmiddlewaretoken':
+            Placement.objects.create(
+                player = User.objects.get(id=request.user.id),
+                bet = Bet.objects.get(id=bet),
+                option = BetOption.objects.get(id=option)
+            )
 
-
-    return HttpResponseRedirect(reverse('maingame:show_placements', args=(group_id,event_id,)))
+    return HttpResponseRedirect(reverse('maingame:show_placements', args=(group_id,event_id)))
 
 def leaderboard(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
