@@ -1,20 +1,15 @@
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from maingame.models import Group, Event, UserGroupRole, UserEventRole, Bet, BetOption, Placement, EventResult, BetResult, EventType, StatusType, UserRole
 from django.contrib.auth.models import User
 from django.contrib import messages
 import datetime
 import pytz
-from maingame.utils.enums import StatusType, UserRoles, EventType
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import logout
+from maingame.utils.enums import StatusType, UserRoles
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from maingame.forms import CustomUserCreationForm
+
 
 #How to render this check to see if user is ADMIN on basetemplate / other pages?
 #UserEventRole.objects.get(user=request.user.id, event=event_id))
@@ -72,7 +67,7 @@ def create_group_and_event(request):
     new_event.players.add(user)
     new_event.groups.add(new_group)
 
-    role_admin = UserRole.objects.get(name=UserRoles.ADMIN.value)
+    role_admin = UserRole.objects.get(id=UserRoles.ADMIN.value)
 
     UserGroupRole.objects.create(
       user=user, 
@@ -132,9 +127,6 @@ def end_event(request, group_id, event_id):
 @login_required
 def add_bets(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
-
-    import pdb
-    pdb.set_trace()
     event_commissioner = UserEventRole.objects.get(
       role=UserRoles.ADMIN.value, 
       event=event_id
@@ -179,7 +171,7 @@ def create_bet(request, group_id, event_id):
       start_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), 
       end_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), 
       question=request.POST['betQuestion'], 
-      status=StatusType.objects.get(id=StatusType.PENDING.value)
+      status_id=StatusType.PENDING.value
       )
 
     BetOption.objects.create(
