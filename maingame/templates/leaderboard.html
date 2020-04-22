@@ -3,12 +3,12 @@
 <!-- pass group object (per db contains name and particpatns) -->
 <h2 class="col text-center">{{ event.name }}</h2>
 <h6 class="col text-center">Group ID: {{ group_id }}-{{ event.id }}</h6>
-<h6 class="col text-center">Commissioner: {{ event_commissioner.first_name }}</h6>
+<h6 class="col text-center">Commissioner: {{ event_commissioner }}</h6>
 <h6 class="col text-center">Stakes: {{ event.stakes }}</h6>
 
 </br> 
 
-<h2 class="col text-center">My Rank: {{user.stats.rank}}</h2>
+<h2 class="col text-center">My Rank: {{user_best_result_dict.rank}}</h2>
 
 </br> 
 
@@ -16,16 +16,16 @@
 <div class="container">
   <div class="row">
     <div class="col">
-      Bets Won</br>
-      {{user.stats.won}}
+      Won</br>
+      {{ user_best_result_dict.won }}
     </div>
     <div class="col">
-      Bets Lost</br>
-      {{user.stats.won}}
+      Lost</br>
+      {{ user_best_result_dict.lost }}
     </div>
     <div class="col">
-      Bets Remaining</br>
-      {{user.stats.remaining}}
+      Remaining</br>
+      {{ user_best_result_dict.remaining }}
     </div>
   </div>
 </div>
@@ -42,12 +42,12 @@
     </tr>
   </thead>
   <tbody>
-    {% for participant in group.participant_standings %}
+    {% for player, results in bet_results_dict.items %}
     <tr>
       <th scope="row">{{ forloop.counter }}</th>
-      <td>{{ participant.name }}</td>
-      <td>{{ participant.won }}</td>
-      <td>{{ participant.lost }}</td>
+      <td>{{ player }}</td>
+      <td>{{ results.won }}</td>
+      <td>{{ results.lost }}</td>
     </tr>
     {% endfor %}
   </tbody>
