@@ -5,65 +5,34 @@ from .models import User, Group, Event, UserGroupRole, UserEventRole, Bet, BetOp
 from django.contrib import messages
 import datetime
 import pytz
-import pdb
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from maingame.forms import CustomUserCreationForm
 
 #How to render this check to see if user is ADMIN on basetemplate / other pages?
 #UserEventRole.objects.get(user=request.user.id, event=event_id))
 #can this be done more intelligently with middleware?
-
-def login(request):
-
-    return render(request, 'login.html', {})
-
-def login_user(request):
-    #Lisa will be updating authetntication
-    try:
-      email = request.POST["loginEmail"]
-      existing_user = User.objects.get(email=email)
-
-      if existing_user:
-        request.session['is_authenticated'] = True
-
-        return HttpResponseRedirect(reverse('index'))
-
-    except (KeyError, User.DoesNotExist):
-      # Redisplay the login form.
-      return render(
-        request, 
-        'login.html', 
-        {
-        'error_message_login': "Hmm, we don't have that email registered. Maybe there was a typo or sign up under 'New User' below!"
-        })
-    
-
-def create_user(request):
-    email = request.POST["createEmail"]
-    existing_user = User.objects.filter(email=email)
-    
-    if existing_user:
-      return render(
-        request, 
-        'login.html', 
-        {
-        'error_message_create': "This email is already registered. Please login above!"
-        })
-    
+def signup(request):
+    if request.method == 'POST':
+        f = CustomUserCreationForm(request.POST)
+        if f.is_valid():
+            f.save()
+            messages.success(request, 'Account created successfully')
+            return HttpResponseRedirect(reverse('maingame:signup'))
     else:
-      first_name = request.POST["createFirstName"]
-      join_date = datetime.datetime.now().replace(tzinfo=pytz.UTC)
-
-      User.objects.create(
-        first_name=first_name, 
-        join_date=join_date, 
-        email=email
-        )
-
-      return HttpResponseRedirect(reverse('maingame:index'))
+        f = CustomUserCreationForm()
+    return render(request, 'signup.html', {'form': f})
 
 def index(request):
-
   return render(request, 'index.html', {})
 
+@login_required
 def join_group_and_event(request):
     try:
       groupAndEventIdArray = request.POST["groupAndEventId"].split('-')
@@ -81,6 +50,7 @@ def join_group_and_event(request):
           'error_message': "There is no Group with that code."
           })
 
+@login_required
 def create_group_and_event(request):
     new_group = Group.objects.create(name=request.POST["groupName"])
 
@@ -117,6 +87,7 @@ def create_group_and_event(request):
 
     return HttpResponseRedirect(reverse('maingame:group_admin', args=[new_group.id, new_event.id]))
 
+@login_required
 def group_admin(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
 
@@ -133,24 +104,28 @@ def group_admin(request, group_id, event_id):
       'is_event_ended': is_event_ended
       })
 
+@login_required
 def set_stakes(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.stakes = request.POST["setStakes"]
 
     return HttpResponseRedirect(reverse('maingame:add_bets', args=(group_id,event_id,)))
 
+@login_required
 def start_event(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.start_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
     return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id,event_id,)))
 
+@login_required
 def end_event(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.end_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
     return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id,event_id,)))
 
+@login_required
 def add_bets(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
 
@@ -185,6 +160,7 @@ def add_bets(request, group_id, event_id):
       'bets_list': bets_list
       })
 
+@login_required
 def create_bet(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
 
@@ -212,6 +188,7 @@ def create_bet(request, group_id, event_id):
 
     return HttpResponseRedirect(reverse('maingame:add_bets', args=(group_id,event_id,)))
 
+@login_required
 def show_placements(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
 
@@ -297,6 +274,7 @@ def show_placements(request, group_id, event_id):
       'is_admin': is_admin
       })
 
+@login_required
 def create_placements(request, group_id, event_id):
     request_data = request.POST.dict()
 
@@ -310,6 +288,7 @@ def create_placements(request, group_id, event_id):
 
     return HttpResponseRedirect(reverse('maingame:show_placements', args=(group_id,event_id)))
 
+@login_required
 def leaderboard(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event_commissioner = UserEventRole.objects.get(

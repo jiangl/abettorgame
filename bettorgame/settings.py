@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'maingame.apps.MaingameConfig'
+    'maingame.apps.MaingameConfig',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     # Custom middleware
 ]
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 ROOT_URLCONF = 'bettorgame.urls'
 
 TEMPLATES = [
@@ -125,6 +127,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+LOGIN_REDIRECT_URL = '/'
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())

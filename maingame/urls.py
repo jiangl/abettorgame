@@ -5,9 +5,7 @@ from . import views
 app_name = 'maingame'
 urlpatterns = [
     path('', views.index, name='index'),
-    path('login', views.login, name='login'),
-    path('login-user', views.login_user, name='login_user'),
-    path('create-user', views.create_user, name='create_user'),
+    path('signup', views.signup, name='signup'),
     path('join-group-and-event', views.join_group_and_event, name='join_group_and_event'),
     path('create-group-and-event', views.create_group_and_event, name='create_group_and_event'),
     path('<int:group_id>/<int:event_id>/group-admin', views.group_admin, name='group_admin'),
