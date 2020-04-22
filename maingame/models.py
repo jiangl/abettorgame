@@ -2,6 +2,7 @@ from django.db import models
 from .utils import db_defaults
 from django.contrib.auth.models import User
 
+
 class EventType(models.Model):
     name = models.CharField(max_length=200)
 

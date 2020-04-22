@@ -37,10 +37,10 @@ maingame_statustype:
     - [COMPLETE]
     - [FAILED]
 auth_user:
-  header: [first_name, last_name, join_date, email, username, phone_number]
+  header: [first_name, last_name, date_joined, email, username, password, is_superuser, is_staff, is_active]
   data:
-    - [Lisa, '', 2020-04-12 14:47:57-04, feefifofisa@gmail.com, feefifofisa@gmail.com, ~]
-    - [Justin, '', 2020-04-12 14:47:57-04, jncn1183@gmail.com, jncn1183@gmail.com, ~]
+    - [Lisa, '', 2020-04-12 14:47:57-04, feefifofisa@gmail.com, feefifofisa@gmail.com, temppassword123, True, True, True]
+    - [Justin, '', 2020-04-12 14:47:57-04, jncn1183@gmail.com, jncn1183@gmail.com, temppassword123, True, True, True]
 maingame_usergrouprole:
   header: [group_id, role_id, user_id]
   data:
