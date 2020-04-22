@@ -5,7 +5,7 @@ from .models import User, Group, Event, UserGroupRole, UserEventRole, Bet, BetOp
 from django.contrib import messages
 import datetime
 import pytz
-from maingame.utils.enum import StatusType
+from maingame.utils.enums import StatusType
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
