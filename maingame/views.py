@@ -5,7 +5,7 @@ from .models import User, Group, Event, UserGroupRole, UserEventRole, Bet, BetOp
 from django.contrib import messages
 import datetime
 import pytz
-
+from maingame.utils.enum import StatusType
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
@@ -173,7 +173,7 @@ def create_bet(request, group_id, event_id):
       start_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), 
       end_time=datetime.datetime.now().replace(tzinfo=pytz.UTC), 
       question=request.POST['betQuestion'], 
-      status=StatusType.objects.get(id=1)
+      status=StatusType.objects.get(id=StatusType.PENDING.value)
       )
 
     BetOption.objects.create(
