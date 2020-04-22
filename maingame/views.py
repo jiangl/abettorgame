@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 import datetime
 import pytz
-from maingame.utils.enums import StatusType
+from maingame.utils.enums import StatusType, UserRoles
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
@@ -72,7 +72,7 @@ def create_group_and_event(request):
     new_event.players.add(user)
     new_event.groups.add(new_group)
 
-    role_admin = UserRole.objects.get(id=2)
+    role_admin = UserRole.objects.get(name=UserRoles.ADMIN.value)
 
     UserGroupRole.objects.create(
       user=user, 
