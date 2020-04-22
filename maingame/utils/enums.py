@@ -2,14 +2,14 @@ from enum import Enum
 
 
 class StatusType(Enum):
-    PENDING = 1
-    INITIATED = 2
-    COMPLETED = 3
-    FAILED = 4
+    PENDING = "PENDING"
+    INITIATED = "INITIATED"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
 
 class EventType(Enum):
-    STANDARD = 1
+    STANDARD = "STANDARD"
 
 class UserRoles(Enum):
-    BASIC = 1
-    ADMIN = 2
+    BASIC = "BASIC"
+    ADMIN = "ADMIN"

@@ -38,7 +38,7 @@
               <a class="nav-item nav-link" href="{% url 'maingame:show_placements' group_id event.id %}">Make Bets</a>
               <a class="nav-item nav-link" href="{% url 'maingame:leaderboard' group_id event.id %}">Leaderboard</a>
             {% endif %}
-            {% if request.user|admin_group:group_id %}
+            {% if user|admin_group:group_id %}
               <a class="nav-item nav-link" href="{% url 'maingame:group_admin' group_id event.id %}">ADMIN</a>
             {% endif %}
             <a class="nav-item nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a>

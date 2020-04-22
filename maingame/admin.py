@@ -35,6 +35,7 @@ class EventAdmin(admin.ModelAdmin):
 
 class UserGroupRoleInline(admin.TabularInline):
     model = UserGroupRole
+    extra = 0
 
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('__str__',)

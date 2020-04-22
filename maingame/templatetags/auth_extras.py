@@ -7,7 +7,8 @@ register = template.Library()
 @register.filter(name='admin_group')
 def check_group_admin(user, group):
     try:
-        role = UserGroupRole.objects.filter(user_id=user.id, group_id=group)
-        return (role == UserRoles.ADMIN)
+        usergrouprole = UserGroupRole.objects.filter(user=user.id, group=group)[0]
+        role_name = usergrouprole.role.name
+        return (role_name == UserRoles.ADMIN.value)
     except:
         return False
