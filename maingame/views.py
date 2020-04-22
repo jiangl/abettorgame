@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 import datetime
 import pytz
-from maingame.utils.enums import StatusType, UserRoles
+from maingame.utils.enums import StatusType, UserRoles, EventType
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
@@ -57,7 +57,7 @@ def create_group_and_event(request):
 
     placeholder_future_start_date = datetime.datetime.now().replace(tzinfo=pytz.UTC) + datetime.timedelta(days=365)
     placeholder_future_end_date = placeholder_future_start_date + datetime.timedelta(days=7)
-    placeholder_stakes = 'TBD'
+    placeholder_stakes = '$20, Everyone buys the winner a beer, etc.'
 
     new_event = Event.objects.create(
       start_time=placeholder_future_start_date, 
@@ -109,6 +109,7 @@ def group_admin(request, group_id, event_id):
 def set_stakes(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.stakes = request.POST["setStakes"]
+    event.save()
 
     return HttpResponseRedirect(reverse('maingame:add_bets', args=(group_id,event_id,)))
 
@@ -116,6 +117,7 @@ def set_stakes(request, group_id, event_id):
 def start_event(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.start_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
+    event.save()
 
     return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id,event_id,)))
 
@@ -123,6 +125,7 @@ def start_event(request, group_id, event_id):
 def end_event(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.end_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
+    event.save()
 
     return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id,event_id,)))
 
@@ -209,7 +212,6 @@ def show_placements(request, group_id, event_id):
       for bet in bets:
         bet_options = BetOption.objects.filter(bet=bet).order_by('id')
         bet_options_and_names = []
-
         for bet_option in bet_options:
           #how to make this check option or custom option depending on the bet?
           bet_option_placements = Placement.objects.filter(
@@ -234,7 +236,7 @@ def show_placements(request, group_id, event_id):
         bets_list.append(
           {
           'bet': bet, 
-          'bet_options': bet_options_and_names,
+          'bet_options': bet_options_and_names
           })
 
       # should this be updated to use list comprehension? or ternary operator?
@@ -297,8 +299,34 @@ def leaderboard(request, group_id, event_id):
       event=event_id
       ).user
 
-    user = User.objects.get(id=request.user.id)
+    user_full_name = str(User.objects.get(id=request.user.id)).strip()
 
+    bets = Bet.objects.filter(event=event_id)
+    number_bets_remaining = len([bet for bet in bets if bet.status.name in ['INITIATED', 'PENDING']])
+
+    # load leaderboard empty stats before game started / first bet finished
+    # is there a better way to save this data rather than recalculating from 0 each time?
+    bet_results_dict = {}
+    for player in event.players.all():
+        event_result = EventResult.objects.get(player=player, event=event_id)
+
+        bet_results_dict[str(player).strip()] = {
+            'rank': event_result.rank or 1,
+            'score': event_result.score or 0, 
+            'won': 0, 
+            'lost': 0, 
+            'remaining': number_bets_remaining
+        }
+
+    # For all completed bets, find the BetResult to count the W/L by player
+    bets_completed = [BetResult.objects.filter(bet=bet) for bet in bets if bet.status.name == 'COMPLETED']
+    
+    for bet in bets_completed:
+        player = str(bet.player).strip()
+        if bet.score:
+            bet_results_dict[player.won] += 1
+        else:
+            bet_results_dict[player.lost] += 1
 
     return render(
       request, 
@@ -306,5 +334,7 @@ def leaderboard(request, group_id, event_id):
       {
       'event': event, 
       'group_id': group_id, 
-      'event_commissioner': event_commissioner
+      'event_commissioner': event_commissioner,
+      'bet_results_dict': bet_results_dict,
+      'user_best_result_dict': bet_results_dict[user_full_name]
       })
