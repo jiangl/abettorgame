@@ -9,6 +9,7 @@ class StatusType(Enum):
 
 class EventType(Enum):
     STANDARD = 1
+    CUSTOM = 2
 
 class StandardEventStages(Enum):
     ADD = 1

@@ -1,8 +1,3 @@
-maingame_eventtype:
-  header: [name]
-  data:
-    - [STANDARD]
-    - [CUSTOM]
 maingame_event:
   header: [start_time, end_time, name, type_id, stakes]
   data:
@@ -29,13 +24,6 @@ maingame_group_players:
   data:
     - [1, 1]
     - [1, 2]
-maingame_statustype:
-  header: [name]
-  data:
-    - [PENDING]
-    - [INITIATED]
-    - [COMPLETE]
-    - [FAILED]
 auth_user:
   header: [first_name, last_name, date_joined, email, username, password, is_superuser, is_staff, is_active]
   data:
@@ -50,11 +38,6 @@ maingame_usereventrole:
   data:
     - [1, 1, 1]
     - [1, 2, 2]
-maingame_userrole:
-  header: [name]
-  data:
-    - [BASIC]
-    - [ADMIN]
 maingame_bet:
   header: [created_time, start_time, question, notes, multiplier, outcome, end_time, creator_id, event_id, status_id]
   data:
