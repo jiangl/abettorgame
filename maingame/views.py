@@ -97,7 +97,8 @@ def create_group_and_event(request):
 def group_admin(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
 
-    is_event_started = event.start_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
+    is_event_started = event.start_time > datetime.datetime.now().replace(tzinfo=pytz.UTC)
+
     is_event_ended = event.end_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
     return render(

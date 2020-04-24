@@ -10,6 +10,11 @@ class StatusType(Enum):
 class EventType(Enum):
     STANDARD = 1
 
+class StandardEventStages(Enum):
+    ADD = 1
+    PLACE = 2
+    END = 3
+
 class UserRoles(Enum):
     BASIC = 1
     ADMIN = 2

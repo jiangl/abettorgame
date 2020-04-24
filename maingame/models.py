@@ -3,8 +3,15 @@ from .utils import db_defaults
 from django.contrib.auth.models import User
 
 
+class EventStage(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
 class EventType(models.Model):
     name = models.CharField(max_length=200)
+    stages = models.ManyToManyField(EventStage)
 
     def __str__(self):
         return self.name
@@ -40,6 +47,11 @@ class Event(models.Model):
     groups = models.ManyToManyField(Group)
     name = models.CharField(max_length=200)
     stakes = models.CharField(max_length=200)
+    current_stage = models.ForeignKey(
+        EventStage,
+        null=True,
+        on_delete=models.SET_NULL
+    )
 
     def __str__(self):
         return self.name
@@ -67,6 +79,9 @@ class UserGroupRole(models.Model):
             self.role.name
         )
 
+    class Meta:
+        unique_together = (('user', 'group'),)
+
 class UserEventRole(models.Model):
     user = models.ForeignKey(
         User,
@@ -89,6 +104,9 @@ class UserEventRole(models.Model):
             self.event.name,
             self.role.name
         )
+
+    class Meta:
+        unique_together = (('user', 'event'),)
 
 class Bet(models.Model):
     creator = models.ForeignKey(
@@ -160,6 +178,9 @@ class Placement(models.Model):
             option_chosen,
         )
 
+    class Meta:
+        unique_together = (('player', 'bet'),)
+
 class BetResult(models.Model):
     player = models.ForeignKey(
         User,
@@ -178,6 +199,9 @@ class BetResult(models.Model):
             self.player.last_name,
             self.score,
         )
+
+    class Meta:
+        unique_together = (('player', 'bet'),)
 
 class EventResult(models.Model):
     player = models.ForeignKey(
@@ -199,3 +223,6 @@ class EventResult(models.Model):
             self.score,
             self.rank
         )
+
+    class Meta:
+        unique_together = (('player', 'event'),)
