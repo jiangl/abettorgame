@@ -34,7 +34,7 @@
 <div class="container">
   <div class="row">
    <div class="col text-center">
-    {% if not is_event_started %}
+    {% if is_event_started %}
     <form action="{% url 'maingame:start_event' group_id event.id %}" method="post">
       {% csrf_token %}
       <button type="submit" class="btn btn-success">LOCK IN BETS!</button>

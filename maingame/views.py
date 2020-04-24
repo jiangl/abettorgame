@@ -10,6 +10,7 @@ from maingame.utils.enums import StatusType, UserRoles
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from maingame.forms import CustomUserCreationForm
+from maingame.utils.enums import EventType, StandardEventStages
 
 
 def signup(request):
@@ -45,7 +46,7 @@ def join_group_and_event(request):
       group.players.add(request.user)
       event.players.add(request.user)
 
-      return HttpResponseRedirect(reverse('maingame:add_bets', args=[group.id, event.id]))
+      return HttpResponseRedirect(reverse('maingame:add_bets', args=[group.id, event.id, StandardEventStages,]))
 
     except:
         # Redisplay the question voting form.
@@ -91,15 +92,19 @@ def create_group_and_event(request):
       role=role_admin
       )
 
-    return HttpResponseRedirect(reverse('maingame:group_admin', args=[new_group.id, new_event.id]))
+    return HttpResponseRedirect(reverse('maingame:group_admin', args=[new_group.id, new_event.id, StandardEventStages,]))
 
 @login_required
 def group_admin(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
+    is_event_started = False
+    is_event_ended = False
 
-    is_event_started = event.start_time > datetime.datetime.now().replace(tzinfo=pytz.UTC)
-
-    is_event_ended = event.end_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
+    if event.type.id is EventType.STANDARD:
+        if event.current_stage is not None:
+            is_event_started = True
+        if event.current_stage is StandardEventStages.END:
+            is_event_ended = True
 
     return render(
       request, 
@@ -115,9 +120,13 @@ def group_admin(request, group_id, event_id):
 def set_stakes(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.stakes = request.POST["setStakes"]
+
+    if event.type.id is EventType.STANDARD:
+        event.current_stage = StandardEventStages.ADD
+
     event.save()
 
-    return HttpResponseRedirect(reverse('maingame:add_bets', args=(group_id,event_id,)))
+    return HttpResponseRedirect(reverse('maingame:add_bets', args=(group_id, event_id, StandardEventStages,)))
 
 @login_required
 def start_event(request, group_id, event_id):
@@ -125,7 +134,7 @@ def start_event(request, group_id, event_id):
     event.start_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
     event.save()
 
-    return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id,event_id,)))
+    return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id, event_id, StandardEventStages,)))
 
 @login_required
 def end_event(request, group_id, event_id):
@@ -133,7 +142,7 @@ def end_event(request, group_id, event_id):
     event.end_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
     event.save()
 
-    return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id,event_id,)))
+    return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id, event_id, StandardEventStages,)))
 
 @login_required
 def add_bets(request, group_id, event_id):
@@ -195,7 +204,7 @@ def create_bet(request, group_id, event_id):
       text=request.POST['betOption2']
       )
 
-    return HttpResponseRedirect(reverse('maingame:add_bets', args=(group_id,event_id,)))
+    return HttpResponseRedirect(reverse('maingame:add_bets', args=(group_id, event_id, StandardEventStages)))
 
 @login_required
 def show_placements(request, group_id, event_id):
@@ -306,7 +315,7 @@ def create_placements(request, group_id, event_id):
                     option = bet_option
                 )
 
-    return HttpResponseRedirect(reverse('maingame:show_placements', args=(group_id,event_id)))
+    return HttpResponseRedirect(reverse('maingame:show_placements', args=(group_id, event_id, StandardEventStages,)))
 
 @login_required
 def leaderboard(request, group_id, event_id):
