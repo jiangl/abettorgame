@@ -2,6 +2,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from maingame.models import Group, Event, UserGroupRole, UserEventRole, Bet, BetOption, Placement, EventResult, BetResult, EventType, StatusType, UserRole
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 from django.contrib import messages
 import datetime
 import pytz
@@ -11,20 +12,26 @@ from django.contrib.auth.decorators import login_required
 from maingame.forms import CustomUserCreationForm
 
 
-#How to render this check to see if user is ADMIN on basetemplate / other pages?
-#UserEventRole.objects.get(user=request.user.id, event=event_id))
-#can this be done more intelligently with middleware?
 def signup(request):
     if request.method == 'POST':
         f = CustomUserCreationForm(request.POST)
         if f.is_valid():
-            f.save()
-            messages.success(request, 'Account created successfully')
-            return HttpResponseRedirect(reverse('maingame:signup'))
+            try:
+                f.save()
+                new_user = authenticate(username=f.cleaned_data['email'], 
+                                        password=f.cleaned_data['password1']
+                                        )
+                login(request, new_user)
+                return HttpResponseRedirect(reverse('maingame:index'))
+            except:
+                messages.add_message(request, messages.ERROR, 'There is already an account created with %s.' % f.cleaned_data['email'])
+                f = CustomUserCreationForm()
+                return render(request, 'signup.html', {'form': f})
     else:
         f = CustomUserCreationForm()
     return render(request, 'signup.html', {'form': f})
 
+@login_required
 def index(request):
   return render(request, 'index.html', {})
 
@@ -55,7 +62,7 @@ def create_group_and_event(request):
 
     placeholder_future_start_date = datetime.datetime.now().replace(tzinfo=pytz.UTC) + datetime.timedelta(days=365)
     placeholder_future_end_date = placeholder_future_start_date + datetime.timedelta(days=7)
-    placeholder_stakes = '$20, Everyone buys the winner a beer, etc.'
+    placeholder_stakes = 'TBD'
 
     new_event = Event.objects.create(
       start_time=placeholder_future_start_date, 
