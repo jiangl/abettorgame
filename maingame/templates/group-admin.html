@@ -2,24 +2,23 @@
 {% include 'base-template.html' %}
 
 <form action="{% url 'maingame:set_stakes' group_id event.id %}" method="post">
-  {% csrf_token %}
-  <div class="form-group">
-    <h4 class="bg-secondary text-white">Welcome Commissioner!</h4>
-    <h5>What are the stakes?</h5>
-    {% if not is_event_started %}
-        <input type="text" class="form-control" id="formSetStakesExampleInput" name="setStakes" placeholder="{{ event.stakes }}" required>
-    {% else %}
-        <input class="form-control" type="text" placeholder="{{ event.stakes }}" readonly>
-    {% endif %}
-  </div>
-  <div class="col text-center">
-    {% if not is_event_started %}
-        <button type="submit" class="btn btn-primary">SUBMIT STAKES AND START ADDING BETS</button>
-    {% else %}
-        <button type="submit" class="btn btn-secondary disabled" aria-disabled="true">STAKES ARE SET</button>
-    {% endif %}
-  </div>
-
+    {% csrf_token %}
+    <div class="form-group">
+        <h4 class="bg-secondary text-white">Welcome Commissioner!</h4>
+        <h5>What are the stakes?</h5>
+        {% if allow_set_stakes %}
+            <input type="text" class="form-control" id="formSetStakesExampleInput" name="setStakes" placeholder="{{ event.stakes }}" required>
+        {% else %}
+            <input class="form-control" type="text" placeholder="{{ event.stakes }}" readonly>
+        {% endif %}
+    </div>
+    <div class="col text-center">
+        {% if allow_set_stakes %}
+            <button type="submit" class="btn btn-primary">SUBMIT STAKES AND START ADDING BETS</button>
+        {% else %}
+            <button type="submit" class="btn btn-secondary disabled" aria-disabled="true">STAKES ARE SET</button>
+        {% endif %}
+    </div>
 </form>
 
 </br>
@@ -29,29 +28,34 @@
 
 </br>
 
-<h5 class="col text-center">As the commissioner, you have special powers and responsibilities. When all members of the group have submitted their picks, come back here and hit the "LOCK IN BETS!" button to lock all bets in place.<p></br>On the "Make Bets" page, you have the ability to select the winning option when an individual bet is complete.<p></br>When the game is over, come back here and hit "END GAME". Any bets that do not have a winning option selected will result in a push (tie) for that bet.</h5>
+<h5 class="col text-center">
+    <p>As the commissioner, you have special powers and responsibilities. When all members of the group have submitted their picks, come back here and hit the "LOCK IN BETS!" button to lock all bets in place.</p>
+    <p>On the "Make Bets" page, you have the ability to select the winning option when an individual bet is complete.<p>
+    <p>When the game is over, come back here and hit "END GAME". Any bets that do not have a winning option selected will result in a push (tie) for that bet.</p>
+</h5>
 
 <div class="container">
-  <div class="row">
-   <div class="col text-center">
-    {% if is_event_started %}
-    <form action="{% url 'maingame:start_event' group_id event.id %}" method="post">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-success">LOCK IN BETS!</button>
-    </form>
-    {% else %}
-      <button class="btn btn-secondary disabled" role="button" aria-disabled="true">BETS LOCKED IN!</button>
-    {% endif %}
-    </div>
-   <div class="col text-center">
-    {% if is_event_started and not is_event_ended %}
-    <form action="{% url 'maingame:end_event' group_id event.id %}" method="post">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-danger">END GAME</button>
-    </form>
-    {% else %}
-      <button class="btn btn-secondary disabled" role="button" aria-disabled="true">GAME IS OVER!</button>
-    {% endif %}
-    </div>
+    <div class="row">
+        <div class="col text-center">
+            {% if allow_lock_bets %}
+                <form action="{% url 'maingame:start_event' group_id event.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">LOCK IN BETS!</button>
+                </form>
+            {% else %}
+                <button class="btn btn-secondary disabled" role="button" aria-disabled="true">BETS LOCKED IN!</button>
+            {% endif %}
+        </div>
+
+       <div class="col text-center">
+           {% if allow_end_game %}
+                <form action="{% url 'maingame:end_event' group_id event.id %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger">END GAME</button>
+                </form>
+            {% else %}
+                <button class="btn btn-secondary disabled" role="button" aria-disabled="true">GAME IS OVER!</button>
+            {% endif %}
+        </div>
   </div>
 </div>

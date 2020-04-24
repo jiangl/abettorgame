@@ -97,24 +97,30 @@ def create_group_and_event(request):
 @login_required
 def group_admin(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
-    is_event_started = False
-    is_event_ended = False
+    allow_set_stakes = False
+    allow_lock_bets = False
+    allow_end_game = False
 
-    if event.type.id is EventType.STANDARD.value:
-        if event.current_stage is not None:
-            is_event_started = True
-        if event.current_stage is StandardEventStages.END:
-            is_event_ended = True
+    current_stage = event.current_stage
+    event_type = event.type.id
+    if event_type is EventType.STANDARD.value:
+        if current_stage is None:
+            allow_set_stakes = True
+        else:
+            allow_end_game = True
+            if current_stage is StandardEventStages.ADD:
+                allow_lock_bets = True
 
     return render(
-      request, 
-      'group-admin.html', 
-      {
-      'event': event, 
-      'group_id': group_id, 
-      'is_event_started': is_event_started,
-      'is_event_ended': is_event_ended
-      })
+        request,
+        'group-admin.html',
+        {
+            'event': event,
+            'group_id': group_id,
+            'allow_set_stakes': allow_set_stakes,
+            'allow_lock_bets': allow_lock_bets,
+            'allow_end_game': allow_end_game
+        })
 
 @login_required
 def set_stakes(request, group_id, event_id):
@@ -131,6 +137,8 @@ def set_stakes(request, group_id, event_id):
 def start_event(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.start_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
+    if event.type.id is EventType.STANDARD.value:
+        event.current_stage_id = StandardEventStages.PLACE.value
     event.save()
 
     return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id, event_id)))
