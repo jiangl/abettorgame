@@ -35,6 +35,9 @@ def join_group_and_event(request):
       group = Group.objects.get(id=groupAndEventIdArray[0])
       event = Event.objects.get(id=groupAndEventIdArray[1])
 
+      group.players.add(request.user)
+      event.players.add(request.user)
+
       return HttpResponseRedirect(reverse('maingame:add_bets', args=[group.id, event.id]))
 
     except:
@@ -291,9 +294,9 @@ def leaderboard(request, group_id, event_id):
     event_commissioner = UserEventRole.objects.get(
       role=2, 
       event=event_id
-      ).user
+      ).user.first_name
 
-    user_first_name = User.objects.get(id=request.user.id).first_name
+    user_first_name = request.user.first_name
 
     bets = Bet.objects.filter(event=event_id)
     number_bets_remaining = len([bet for bet in bets if bet.status.name in ['INITIATED', 'PENDING']])
@@ -301,12 +304,16 @@ def leaderboard(request, group_id, event_id):
     # load leaderboard empty stats before game started / first bet finished
     # is there a better way to save this data rather than recalculating from 0 each time?
     bet_results_dict = {}
+    event_result = None
     for player in event.players.all():
-        event_result = EventResult.objects.get(player=player, event=event_id)
+        try:
+            event_result = EventResult.objects.get(player=player, event=event_id)
+        except:
+            pass
 
         bet_results_dict[player.first_name] = {
-            'rank': event_result.rank or 1,
-            'score': event_result.score or 0, 
+            'rank': event_result.rank if event_result else 1,
+            'score': event_result.score if event_result else 0, 
             'won': 0, 
             'lost': 0, 
             'remaining': number_bets_remaining
