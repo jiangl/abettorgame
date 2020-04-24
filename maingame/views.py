@@ -201,7 +201,7 @@ def show_placements(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
 
     event_commissioner = UserEventRole.objects.get(
-      role=2, 
+      role=UserRoles.ADMIN.value, 
       event=event_id
       ).user
 
@@ -287,11 +287,23 @@ def create_placements(request, group_id, event_id):
 
     for bet, option in request_data.items():
         if str(bet) != 'csrfmiddlewaretoken':
-            Placement.objects.create(
-                player = User.objects.get(id=request.user.id),
-                bet = Bet.objects.get(id=bet),
-                option = BetOption.objects.get(id=option)
-            )
+            bet_option = BetOption.objects.get(id=option)
+            try:
+                placement = Placement.objects.get(
+                    player = User.objects.get(id=request.user.id),
+                    bet = Bet.objects.get(id=bet)
+                )
+                # only update the placement if the option changed
+                if placement.option != option:
+                    placement.option = bet_option
+                    placement.save()
+            except:
+                # if no placement exists
+                Placement.objects.create(
+                    player = User.objects.get(id=request.user.id),
+                    bet = Bet.objects.get(id=bet),
+                    option = bet_option
+                )
 
     return HttpResponseRedirect(reverse('maingame:show_placements', args=(group_id,event_id)))
 
@@ -299,7 +311,7 @@ def create_placements(request, group_id, event_id):
 def leaderboard(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event_commissioner = UserEventRole.objects.get(
-      role=2, 
+      role=UserRoles.ADMIN.value, 
       event=event_id
       ).user.first_name
 
