@@ -34,12 +34,14 @@
         <div class="navbar-nav">
           {% if user.is_authenticated %}
             {% if group_id and event %}
-              {% if event.current_stage is StandardEventStages.ADD %}
+              {% match_eventstage event "ADD" as is_add_event %}
+              {% match_eventstage event "PLACE" as is_place_event %}
+              {% if is_add_event %}
                 <a class="nav-item nav-link active" href="{% url 'maingame:add_bets' group_id event.id %}">Add Bets <span class="sr-only">(current)</span></a>
-              {% elif event.current_stage is StandardEventStages.PLACE %}
+              {% elif is_place_event %}
                 <a class="nav-item nav-link" href="{% url 'maingame:show_placements' group_id event.id %}">Make Bets</a>
               {% endif %}
-              {% if event.current_stage and event.current_stage is not StandardEventStages.ADD %}
+              {% if event.current_stage and not is_add_event %}
                 <a class="nav-item nav-link" href="{% url 'maingame:leaderboard' group_id event.id %}">Leaderboard</a>
               {% endif %}
             {% endif %}

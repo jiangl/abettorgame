@@ -7,16 +7,16 @@
     <h4 class="bg-secondary text-white">Welcome Commissioner!</h4>
     <h5>What are the stakes?</h5>
     {% if not is_event_started %}
-    <input type="text" class="form-control" id="formSetStakesExampleInput" name="setStakes" placeholder="{{ event.stakes }}" required>
+        <input type="text" class="form-control" id="formSetStakesExampleInput" name="setStakes" placeholder="{{ event.stakes }}" required>
     {% else %}
-    <input class="form-control" type="text" placeholder="{{ event.stakes }}" readonly>
+        <input class="form-control" type="text" placeholder="{{ event.stakes }}" readonly>
     {% endif %}
   </div>
   <div class="col text-center">
     {% if not is_event_started %}
-    <button type="submit" class="btn btn-primary">SUBMIT STAKES AND START ADDING BETS</button>
+        <button type="submit" class="btn btn-primary">SUBMIT STAKES AND START ADDING BETS</button>
     {% else %}
-    <button type="submit" class="btn btn-secondary disabled" aria-disabled="true">STAKES ARE SET</button>
+        <button type="submit" class="btn btn-secondary disabled" aria-disabled="true">STAKES ARE SET</button>
     {% endif %}
   </div>
 
@@ -44,7 +44,7 @@
     {% endif %}
     </div>
    <div class="col text-center">
-    {% if not is_event_ended %}
+    {% if is_event_started and not is_event_ended %}
     <form action="{% url 'maingame:end_event' group_id event.id %}" method="post">
       {% csrf_token %}
       <button type="submit" class="btn btn-danger">END GAME</button>
