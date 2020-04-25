@@ -302,25 +302,14 @@ def show_placements(request, group_id, event_id):
 def create_placements(request, group_id, event_id):
     request_data = request.POST.dict()
 
-    for bet, option in request_data.items():
-        if str(bet) != 'csrfmiddlewaretoken':
-            bet_option = BetOption.objects.get(id=option)
-            try:
-                placement = Placement.objects.get(
-                    player = User.objects.get(id=request.user.id),
-                    bet = Bet.objects.get(id=bet)
-                )
-                # only update the placement if the option changed
-                if placement.option != option:
-                    placement.option = bet_option
-                    placement.save()
-            except:
-                # if no placement exists
-                Placement.objects.create(
-                    player = User.objects.get(id=request.user.id),
-                    bet = Bet.objects.get(id=bet),
-                    option = bet_option
-                )
+    for bet_id, option_id in request_data.items():
+        if str(bet_id) != 'csrfmiddlewaretoken':
+            placement, created = Placement.objects.get_or_create(
+                player_id = request.user.id,
+                bet_id = bet_id
+            )
+            placement.option_id = option_id
+            placement.save()
 
     return HttpResponseRedirect(reverse('maingame:show_placements', args=(group_id, event_id)))
 
