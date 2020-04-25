@@ -19,6 +19,9 @@
             {% for bet_option in bet.bet_options %}
                 <div class="container m-1 p-2 bet-selection-div border col radio-inline{% if bet_option.selected %}bg-light{% endif %}">
                     <p {% if bet_option.selected %}class="font-weight-bold"{% endif %}>
+                        {% if bet_option.is_outcome %}
+                            <div class="alert alert-success">Correct</div>
+                        {% endif %}
                         {{ bet_option.bet_option.text }}
                     </p>
                     <p>

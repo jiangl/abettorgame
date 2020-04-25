@@ -103,14 +103,15 @@ def group_admin(request, group_id, event_id):
     allow_start_game = False
     allow_end_game = False
 
-
     current_stage_id = event.current_stage.id if event.current_stage else None
     event_type_id = event.type.id
+
     if event_type_id is EventType.STANDARD.value:
         if current_stage_id is None:
             allow_set_stakes = True
         else:
-            allow_end_game = True
+            if current_stage_id is not StandardEventStages.END.value:
+                allow_end_game = True
             if current_stage_id is StandardEventStages.ADD.value:
                 allow_lock_bets = True
             elif current_stage_id is StandardEventStages.PLACE.value:
@@ -134,7 +135,7 @@ def set_stakes(request, group_id, event_id):
     event.stakes = request.POST["setStakes"]
 
     if event.type.id is EventType.STANDARD.value:
-        event.current_stage_id = StandardEventStages.ADD.value
+        event.current_stage = EventStage.objects.get(id=StandardEventStages.ADD.value)
     event.save()
 
     return HttpResponseRedirect(reverse('maingame:add_bets', args=(group_id, event_id)))
@@ -373,6 +374,7 @@ def running_bets(request, group_id, event_id):
       for bet in bets:
         bet_options = BetOption.objects.filter(bet=bet).order_by('id')
         bet_options_and_names = []
+        bet_outcome = bet.outcome
         for bet_option in bet_options:
           #how to make this check option or custom option depending on the bet?
           bet_option_placements = Placement.objects.filter(
@@ -382,17 +384,20 @@ def running_bets(request, group_id, event_id):
           if bet_option_placements:
             player_first_names = ', '.join([bet_option.player.first_name for bet_option in bet_option_placements])
             selected = current_user_firstname in player_first_names
+
             bet_options_and_names.append(
               {
               'bet_option': bet_option,
               'player_first_names': player_first_names,
-              'selected': selected
+              'selected': selected,
+              'is_outcome': bet_outcome == bet_option.text
               })
           else:
             bet_options_and_names.append(
               {
               'bet_option': bet_option,
-              'player_first_names': ''
+              'player_first_names': '',
+              'is_outcome': bet_outcome == bet_option.text
               })
         bets_list.append(
           {
