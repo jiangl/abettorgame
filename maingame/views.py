@@ -11,6 +11,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from maingame.forms import CustomUserCreationForm
 from maingame.utils.enums import EventType, StandardEventStages
+from maingame.utils.backfill import add_user_to_groupevent
 
 
 def signup(request):
@@ -19,13 +20,18 @@ def signup(request):
         if f.is_valid():
             try:
                 f.save()
-                new_user = authenticate(username=f.cleaned_data['email'], 
-                                        password=f.cleaned_data['password1']
-                                        )
+                new_user = authenticate(
+                    username=f.cleaned_data['email'],
+                    password=f.cleaned_data['password1']
+                )
                 login(request, new_user)
                 return HttpResponseRedirect(reverse('maingame:index'))
             except:
-                messages.add_message(request, messages.ERROR, 'There is already an account created with %s.' % f.cleaned_data['email'])
+                messages.add_message(
+                    request,
+                    messages.ERROR,
+                    'There is already an account created with %s.' % f.cleaned_data['email']
+                )
                 f = CustomUserCreationForm()
                 return render(request, 'signup.html', {'form': f})
     else:
@@ -39,23 +45,23 @@ def index(request):
 @login_required
 def join_group_and_event(request):
     try:
-      groupAndEventIdArray = request.POST["groupAndEventId"].split('-')
-      group = Group.objects.get(id=groupAndEventIdArray[0])
-      event = Event.objects.get(id=groupAndEventIdArray[1])
-
-      group.players.add(request.user)
-      event.players.add(request.user)
-
-      return HttpResponseRedirect(reverse('maingame:add_bets', args=[group.id, event.id]))
-
+        groupAndEventIdArray = request.POST["groupAndEventId"].split('-')
+        group_id = groupAndEventIdArray[0]
+        event_id = groupAndEventIdArray[1]
+        add_user_to_groupevent(
+            user_id=request.user.id,
+            group_id=group_id,
+            event_id=event_id
+        )
+        return HttpResponseRedirect(reverse('maingame:add_bets', args=[group_id, event_id]))
     except:
         # Redisplay the question voting form.
         return render(
-          request, 
-          'index.html', 
-          {
-          'error_message': "There is no Group with that code."
-          })
+            request,
+            'index.html',
+            {
+                'error_message': "There is no Group with that code."
+            })
 
 @login_required
 def create_group_and_event(request):
@@ -181,6 +187,12 @@ def end_event(request, group_id, event_id):
 
 @login_required
 def add_bets(request, group_id, event_id):
+    add_user_to_groupevent(
+        user_id=request.user.id,
+        group_id=group_id,
+        event_id=event_id
+    )
+
     event = Event.objects.get(id=event_id)
     event_commissioner = UserEventRole.objects.get(
       role=UserRoles.ADMIN.value, 
@@ -243,6 +255,12 @@ def create_bet(request, group_id, event_id):
 
 @login_required
 def show_placements(request, group_id, event_id):
+    add_user_to_groupevent(
+        user_id=request.user.id,
+        group_id=group_id,
+        event_id=event_id
+    )
+
     event = Event.objects.get(id=event_id)
 
     event_commissioner = UserEventRole.objects.get(
