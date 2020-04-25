@@ -15,6 +15,7 @@ maingame_eventstage:
   data:
     - [ADD]
     - [PLACE]
+    - [RUN]
     - [END]
 maingame_eventtype:
   header: [name]

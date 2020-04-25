@@ -14,7 +14,8 @@ class EventType(Enum):
 class StandardEventStages(Enum):
     ADD = 1
     PLACE = 2
-    END = 3
+    RUN = 3
+    END = 4
 
 class UserRoles(Enum):
     BASIC = 1

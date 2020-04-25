@@ -99,17 +99,20 @@ def group_admin(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     allow_set_stakes = False
     allow_lock_bets = False
+    allow_start_game = False
     allow_end_game = False
 
-    current_stage = event.current_stage
-    event_type = event.type.id
-    if event_type is EventType.STANDARD.value:
-        if current_stage is None:
+    current_stage_id = event.current_stage.id
+    event_type_id = event.type.id
+    if event_type_id is EventType.STANDARD.value:
+        if current_stage_id is None:
             allow_set_stakes = True
         else:
             allow_end_game = True
-            if current_stage is StandardEventStages.ADD:
+            if current_stage_id is StandardEventStages.ADD.value:
                 allow_lock_bets = True
+            elif current_stage_id is StandardEventStages.PLACE.value:
+                allow_start_game = True
 
     return render(
         request,
@@ -119,6 +122,7 @@ def group_admin(request, group_id, event_id):
             'group_id': group_id,
             'allow_set_stakes': allow_set_stakes,
             'allow_lock_bets': allow_lock_bets,
+            'allow_start_game': allow_start_game,
             'allow_end_game': allow_end_game
         })
 
@@ -134,11 +138,20 @@ def set_stakes(request, group_id, event_id):
     return HttpResponseRedirect(reverse('maingame:add_bets', args=(group_id, event_id)))
 
 @login_required
+def lock_bets(request, group_id, event_id):
+    event = Event.objects.get(id=event_id)
+    if event.type.id is EventType.STANDARD.value:
+        event.current_stage_id = StandardEventStages.PLACE.value
+    event.save()
+
+    return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id, event_id)))
+
+@login_required
 def start_event(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.start_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
     if event.type.id is EventType.STANDARD.value:
-        event.current_stage_id = StandardEventStages.PLACE.value
+        event.current_stage_id = StandardEventStages.RUN.value
     event.save()
 
     return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id, event_id)))
@@ -147,6 +160,8 @@ def start_event(request, group_id, event_id):
 def end_event(request, group_id, event_id):
     event = Event.objects.get(id=event_id)
     event.end_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
+    if event.type.id is EventType.STANDARD.value:
+        event.current_stage_id = StandardEventStages.END.value
     event.save()
 
     return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id, event_id)))
