@@ -1,54 +1,68 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    {% block staticfiles %}
-      {% load static %}
-      <!-- Bootstrap CSS -->
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-      <!-- Custom CSS -->
-      <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-    {% endblock %}
-
-    {% load auth_extras %}
-
+        {% block staticfiles %}
+            {% load static %}
+            <!-- Bootstrap CSS -->
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+            <!-- Custom CSS -->
+            <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+        {% endblock %}
+        {% load auth_extras %}
   </head>
   <body>
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+      <!-- Optional JavaScript -->
+      <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+      <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-    <!-- Nav -->
-    <!-- Hide nav if on login or create and join group pages -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="{% url 'maingame:index' %}">A Bettor Game</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          {% if user.is_authenticated %}
-            {% if group_id and event %}
-              <a class="nav-item nav-link active" href="{% url 'maingame:add_bets' group_id event.id %}">Add Bets <span class="sr-only">(current)</span></a>
-              <a class="nav-item nav-link" href="{% url 'maingame:show_placements' group_id event.id %}">Make Bets</a>
-              <a class="nav-item nav-link" href="{% url 'maingame:leaderboard' group_id event.id %}">Leaderboard</a>
-            {% endif %}
-            {% if user|admin_group:group_id %}
-              <a class="nav-item nav-link" href="{% url 'maingame:group_admin' group_id event.id %}">ADMIN</a>
-            {% endif %}
-            <a class="nav-item nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a>
-          {% else %}
-            <a class="nav-item nav-link" href="{% url 'login'%}?next={{request.path}}">Login</a>
-            <a class="nav-item nav-link" href="{% url 'maingame:signup'%}?next={{request.path}}">Signup</a>
-          {% endif %}
+      <!-- Nav -->
+      <!-- Hide nav if on login or create and join group pages -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="{% url 'maingame:index' %}">A Bettor Game</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
 
-        </div>
-      </div>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+              {% if user.is_authenticated %}
+                  {% if group_id and event %}
+                      {% match_eventstage event "ADD" as is_add_event %}
+                      {% match_eventstage event "PLACE" as is_place_event %}
+                      {% match_eventstage event "RUN" as is_run_event %}
+                      {% match_eventstage event "END" as is_end_event %}
+
+                      {% if is_add_event %}
+                          <a class="nav-item nav-link active" href="{% url 'maingame:add_bets' group_id event.id %}">Add Bets <span class="sr-only">(current)</span></a>
+                      {% elif is_place_event %}
+                          <a class="nav-item nav-link" href="{% url 'maingame:show_placements' group_id event.id %}">Make Bets</a>
+                      {% elif is_run_event or is_end_event%}
+                          <a class="nav-item nav-link" href="{% url 'maingame:running_bets' group_id event.id %}">Show Bets</a>
+                      {% endif %}
+
+                      {% if event.current_stage and not is_add_event %}
+                        <a class="nav-item nav-link" href="{% url 'maingame:leaderboard' group_id event.id %}">Leaderboard</a>
+                      {% endif %}
+                  {% endif %}
+
+                  {% if user|admin_group:group_id %}
+                      <a class="nav-item nav-link" href="{% url 'maingame:group_admin' group_id event.id %}">ADMIN</a>
+                  {% endif %}
+
+                  <a class="nav-item nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a>
+              {% else %}
+
+                  <a class="nav-item nav-link" href="{% url 'login'%}?next={{request.path}}">Login</a>
+                  <a class="nav-item nav-link" href="{% url 'maingame:signup'%}?next={{request.path}}">Signup</a>
+              {% endif %}
+          </div>
+          </div>
     </nav>
   </body>
 </html>

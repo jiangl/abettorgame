@@ -9,6 +9,13 @@ class StatusType(Enum):
 
 class EventType(Enum):
     STANDARD = 1
+    CUSTOM = 2
+
+class StandardEventStages(Enum):
+    ADD = 1
+    PLACE = 2
+    RUN = 3
+    END = 4
 
 class UserRoles(Enum):
     BASIC = 1

@@ -1,0 +1,30 @@
+maingame_statustype:
+  header: [name]
+  data:
+    - [PENDING]
+    - [INITIATED]
+    - [COMPLETE]
+    - [FAILED]
+maingame_userrole:
+  header: [name]
+  data:
+    - [BASIC]
+    - [ADMIN]
+maingame_eventstage:
+  header: [name]
+  data:
+    - [ADD]
+    - [PLACE]
+    - [RUN]
+    - [END]
+maingame_eventtype:
+  header: [name]
+  data:
+    - [STANDARD]
+    - [CUSTOM]
+maingame_eventtype_stages:
+  header: [eventtype_id, eventstage_id]
+  data:
+    - [1, 1]
+    - [1, 2]
+    - [1, 3]
