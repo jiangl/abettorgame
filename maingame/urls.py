@@ -14,7 +14,10 @@ urlpatterns = [
     path('<int:group_id>/<int:event_id>/create-bet', views.create_bet, name='create_bet'),
     path('<int:group_id>/<int:event_id>/start-event', views.start_event, name='start_event'),
     path('<int:group_id>/<int:event_id>/end-event', views.end_event, name='end_event'),
+    path('<int:group_id>/<int:event_id>/lock-bets', views.lock_bets, name='lock_bets'),
     path('<int:group_id>/<int:event_id>/show-placements', views.show_placements, name='show_placements'),
     path('<int:group_id>/<int:event_id>/create-placements', views.create_placements, name='create_placements'),
+    path('<int:group_id>/<int:event_id>/running-bets', views.running_bets, name='running_bets'),
+    path('<int:group_id>/<int:event_id>/admin_bet_result', views.admin_bet_result, name='admin_bet_result'),
     path('<int:group_id>/<int:event_id>/leaderboard', views.leaderboard, name='leaderboard'),
 ]

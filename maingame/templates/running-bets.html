@@ -1,0 +1,43 @@
+{% include 'base-template.html' %}
+{% load status_checks %}
+
+<h2 class="col text-center">{{ event.name }}</h2>
+<h6 class="col text-center">Group ID: {{ group_id }}-{{ event.id }}</h6>
+<h6 class="col text-center">Commissioner: {{ event_commissioner.first_name }}</h6>
+<h6 class="col text-center">Stakes: {{ event.stakes }}</h6>
+
+<h4 class="bg-secondary text-white">Bets</h4>
+{% for bet in bets_list %}
+    <div class="container border">
+        <div class="row">
+            <b>{{ bet.bet.question }}</b>
+        </div>
+        <div class="row">
+            <p class="text-muted small">Creator: {{ bet.bet.creator.first_name }}</p>
+        </div>
+        <div class="row">
+            {% for bet_option in bet.bet_options %}
+                <div class="container m-1 p-2 bet-selection-div border col radio-inline{% if bet_option.selected %}bg-light{% endif %}">
+                    <p {% if bet_option.selected %}class="font-weight-bold"{% endif %}>
+                        {{ bet_option.bet_option.text }}
+                    </p>
+                    <p>
+                        {% if bet_option.player_first_names %}
+                          <div class="row p-1 ml-3 border-top text-muted small">
+                            {{ bet_option.player_first_names }}
+                          </div>
+                        {% endif %}
+                    </p>
+                    {% match_bet_status bet.bet "COMPLETED" as bet_completed %}
+                    {% if is_admin and not bet_completed %}
+                        <form action="{% url 'maingame:admin_bet_result' group_id event.id %}" method="post">
+                            {% csrf_token %}
+                            <input hidden name="selection" value={{ bet.bet.id}}-{{bet_option.bet_option.id}}>
+                            <button type="submit" class="btn btn-primary">Select Answer</button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}

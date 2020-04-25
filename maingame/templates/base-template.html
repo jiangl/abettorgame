@@ -35,11 +35,14 @@
                   {% if group_id and event %}
                       {% match_eventstage event "ADD" as is_add_event %}
                       {% match_eventstage event "PLACE" as is_place_event %}
+                      {% match_eventstage event "RUN" as is_run_event %}
 
                       {% if is_add_event %}
                           <a class="nav-item nav-link active" href="{% url 'maingame:add_bets' group_id event.id %}">Add Bets <span class="sr-only">(current)</span></a>
                       {% elif is_place_event %}
                           <a class="nav-item nav-link" href="{% url 'maingame:show_placements' group_id event.id %}">Make Bets</a>
+                      {% elif is_run_event %}
+                          <a class="nav-item nav-link" href="{% url 'maingame:running_bets' group_id event.id %}">Show Bets</a>
                       {% endif %}
 
                       {% if event.current_stage and not is_add_event %}

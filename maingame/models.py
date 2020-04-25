@@ -130,7 +130,8 @@ class Bet(models.Model):
 
     outcome = models.CharField(
         max_length=200,
-        blank=True
+        blank=True,
+        null=True
     )
     end_time = models.DateTimeField(null=True)
 
