@@ -66,8 +66,10 @@ def join_group_and_event(request):
           else:
             if current_stage_id is StandardEventStages.ADD.value:
               redirect_url = redirect_url
-            elif current_stage_id in (StandardEventStages.PLACE.value, StandardEventStages.RUN.value):
+            elif current_stage_id is StandardEventStages.PLACE.value:
               redirect_url = 'show_placements'
+            elif current_stage_id is StandardEventStages.RUN.value:
+              redirect_url = 'running_bets'
             else:
               redirect_url = 'leaderboard'
 
