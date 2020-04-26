@@ -540,9 +540,8 @@ def leaderboard(request, group_id, event_id):
 
     # For all completed bets, find the BetResult to count the W/L by player
     bets_completed = [BetResult.objects.filter(bet_id=bet.id) for bet in bets if bet.status.id is StatusType.COMPLETED.value]
-    for bet in bets_completed:
-        if len(bet) > 0:
-            bet = bet[0]
+    for bet_results in bets_completed:
+        for bet in bet_results:
             player = bet.player.first_name
             if bet.score:
                 bet_results_dict[player]['won'] += 1
