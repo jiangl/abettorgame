@@ -53,7 +53,24 @@ def join_group_and_event(request):
             group_id=group_id,
             event_id=event_id
         )
-        return HttpResponseRedirect(reverse('maingame:add_bets', args=[group_id, event_id]))
+
+        event = Event.objects.get(id=event_id)
+        current_stage_id = event.current_stage.id if event.current_stage else None
+        event_type_id = event.type.id
+        redirect_url = 'add_bets'
+
+        if event_type_id is EventType.STANDARD.value:
+          if current_stage_id is None:
+            redirect_url = redirect_url
+          else:
+            if current_stage_id is StandardEventStages.ADD.value:
+              redirect_url = redirect_url
+            elif current_stage_id in (StandardEventStages.PLACE.value, StandardEventStages.RUN.value):
+              redirect_url = 'show_placements'
+            else:
+              redirect_url = 'leaderboard'
+
+        return HttpResponseRedirect(reverse('maingame:{kwarg}'.format(kwarg=redirect_url), args=[group_id, event_id]))
     except:
         # Redisplay the question voting form.
         return render(
