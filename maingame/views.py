@@ -170,7 +170,8 @@ def end_all_bets(event_id):
     for bet in bets_for_event:
         bet.status_id = StatusType.COMPLETED.value
         bet.end_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
-        bet.outcome = None
+        if not bet.outcome:
+            bet.outcome = None
         bet.save()
 
 @login_required
@@ -509,12 +510,13 @@ def leaderboard(request, group_id, event_id):
     # For all completed bets, find the BetResult to count the W/L by player
     bets_completed = [BetResult.objects.filter(bet_id=bet.id) for bet in bets if bet.status.id is StatusType.COMPLETED.value]
     for bet in bets_completed:
-        bet = bet[0]
-        player = bet.player.first_name
-        if bet.score:
-            bet_results_dict[player]['won'] += 1
-        else:
-            bet_results_dict[player]['lost'] += 1
+        if len(bet) > 0:
+            bet = bet[0]
+            player = bet.player.first_name
+            if bet.score:
+                bet_results_dict[player]['won'] += 1
+            else:
+                bet_results_dict[player]['lost'] += 1
 
     return render(
       request, 
