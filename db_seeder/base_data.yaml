@@ -3,7 +3,7 @@ maingame_statustype:
   data:
     - [PENDING]
     - [INITIATED]
-    - [COMPLETE]
+    - [COMPLETED]
     - [FAILED]
 maingame_userrole:
   header: [name]

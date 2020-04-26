@@ -11,6 +11,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from maingame.forms import CustomUserCreationForm
 from maingame.utils.enums import EventType, StandardEventStages
+from maingame.utils.backfill import add_user_to_groupevent
 
 
 def signup(request):
@@ -19,13 +20,18 @@ def signup(request):
         if f.is_valid():
             try:
                 f.save()
-                new_user = authenticate(username=f.cleaned_data['email'], 
-                                        password=f.cleaned_data['password1']
-                                        )
+                new_user = authenticate(
+                    username=f.cleaned_data['email'],
+                    password=f.cleaned_data['password1']
+                )
                 login(request, new_user)
                 return HttpResponseRedirect(reverse('maingame:index'))
             except:
-                messages.add_message(request, messages.ERROR, 'There is already an account created with %s.' % f.cleaned_data['email'])
+                messages.add_message(
+                    request,
+                    messages.ERROR,
+                    'There is already an account created with %s.' % f.cleaned_data['email']
+                )
                 f = CustomUserCreationForm()
                 return render(request, 'signup.html', {'form': f})
     else:
@@ -39,23 +45,23 @@ def index(request):
 @login_required
 def join_group_and_event(request):
     try:
-      groupAndEventIdArray = request.POST["groupAndEventId"].split('-')
-      group = Group.objects.get(id=groupAndEventIdArray[0])
-      event = Event.objects.get(id=groupAndEventIdArray[1])
-
-      group.players.add(request.user)
-      event.players.add(request.user)
-
-      return HttpResponseRedirect(reverse('maingame:add_bets', args=[group.id, event.id]))
-
+        groupAndEventIdArray = request.POST["groupAndEventId"].split('-')
+        group_id = groupAndEventIdArray[0]
+        event_id = groupAndEventIdArray[1]
+        add_user_to_groupevent(
+            user_id=request.user.id,
+            group_id=group_id,
+            event_id=event_id
+        )
+        return HttpResponseRedirect(reverse('maingame:add_bets', args=[group_id, event_id]))
     except:
         # Redisplay the question voting form.
         return render(
-          request, 
-          'index.html', 
-          {
-          'error_message': "There is no Group with that code."
-          })
+            request,
+            'index.html',
+            {
+                'error_message': "There is no Group with that code."
+            })
 
 @login_required
 def create_group_and_event(request):
@@ -164,7 +170,8 @@ def end_all_bets(event_id):
     for bet in bets_for_event:
         bet.status_id = StatusType.COMPLETED.value
         bet.end_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
-        bet.outcome = None
+        if not bet.outcome:
+            bet.outcome = None
         bet.save()
 
 @login_required
@@ -181,6 +188,12 @@ def end_event(request, group_id, event_id):
 
 @login_required
 def add_bets(request, group_id, event_id):
+    add_user_to_groupevent(
+        user_id=request.user.id,
+        group_id=group_id,
+        event_id=event_id
+    )
+
     event = Event.objects.get(id=event_id)
     event_commissioner = UserEventRole.objects.get(
       role=UserRoles.ADMIN.value, 
@@ -243,6 +256,12 @@ def create_bet(request, group_id, event_id):
 
 @login_required
 def show_placements(request, group_id, event_id):
+    add_user_to_groupevent(
+        user_id=request.user.id,
+        group_id=group_id,
+        event_id=event_id
+    )
+
     event = Event.objects.get(id=event_id)
 
     event_commissioner = UserEventRole.objects.get(
@@ -346,11 +365,23 @@ def admin_bet_result(request, group_id, event_id):
     request_data = request.POST.dict().get('selection')
     bet_and_option_ids = request_data.split("-")
 
-    bet = Bet.objects.get(id=bet_and_option_ids[0])
-    bet.outcome = BetOption.objects.get(id=bet_and_option_ids[1]).text
+    bet_id = bet_and_option_ids[0]
+    option_id = bet_and_option_ids[1]
+    bet = Bet.objects.get(id=bet_id)
+    bet.outcome = BetOption.objects.get(id=option_id).text
     bet.status_id = StatusType.COMPLETED.value
     bet.end_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
     bet.save()
+
+    bet_placements = Placement.objects.filter(bet_id=bet_id)
+    correct_user_ids = [placement.player_id for placement in bet_placements.filter(option_id=option_id)]
+    all_players = [placement.player_id for placement in bet_placements]
+
+    for player_id in all_players:
+        bet_result, created = BetResult.objects.get_or_create(bet_id=bet_id, player_id=player_id)
+        if player_id in correct_user_ids:
+            bet_result.add_points(bet.multiplier)
+        bet_result.save()
 
     return HttpResponseRedirect(reverse('maingame:running_bets', args=(group_id, event_id)))
 
@@ -477,14 +508,15 @@ def leaderboard(request, group_id, event_id):
         }
 
     # For all completed bets, find the BetResult to count the W/L by player
-    bets_completed = [BetResult.objects.filter(bet=bet) for bet in bets if bet.status.name == 'COMPLETED']
-    
+    bets_completed = [BetResult.objects.filter(bet_id=bet.id) for bet in bets if bet.status.id is StatusType.COMPLETED.value]
     for bet in bets_completed:
-        player = bet.player.first_name
-        if bet.score:
-            bet_results_dict[player.won] += 1
-        else:
-            bet_results_dict[player.lost] += 1
+        if len(bet) > 0:
+            bet = bet[0]
+            player = bet.player.first_name
+            if bet.score:
+                bet_results_dict[player]['won'] += 1
+            else:
+                bet_results_dict[player]['lost'] += 1
 
     return render(
       request, 
