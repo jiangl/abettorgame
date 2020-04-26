@@ -127,7 +127,6 @@ class Bet(models.Model):
         null=True,
         on_delete=models.SET_NULL
     )
-
     outcome = models.CharField(
         max_length=200,
         blank=True,
@@ -191,7 +190,7 @@ class BetResult(models.Model):
         Bet,
         on_delete=models.CASCADE
     )
-    score = models.FloatField()
+    score = models.FloatField(default=0)
 
     def __str__(self):
         return "Bet: {}, {} {}: {}".format(
@@ -203,6 +202,9 @@ class BetResult(models.Model):
 
     class Meta:
         unique_together = (('player', 'bet'),)
+
+    def add_points(self, points):
+        self.score = self.score + points
 
 class EventResult(models.Model):
     player = models.ForeignKey(

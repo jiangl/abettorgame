@@ -364,11 +364,23 @@ def admin_bet_result(request, group_id, event_id):
     request_data = request.POST.dict().get('selection')
     bet_and_option_ids = request_data.split("-")
 
-    bet = Bet.objects.get(id=bet_and_option_ids[0])
-    bet.outcome = BetOption.objects.get(id=bet_and_option_ids[1]).text
+    bet_id = bet_and_option_ids[0]
+    option_id = bet_and_option_ids[1]
+    bet = Bet.objects.get(id=bet_id)
+    bet.outcome = BetOption.objects.get(id=option_id).text
     bet.status_id = StatusType.COMPLETED.value
     bet.end_time = datetime.datetime.now().replace(tzinfo=pytz.UTC)
     bet.save()
+
+    bet_placements = Placement.objects.filter(bet_id=bet_id)
+    correct_user_ids = [placement.player_id for placement in bet_placements.filter(option_id=option_id)]
+    all_players = [placement.player_id for placement in bet_placements]
+
+    for player_id in all_players:
+        bet_result, created = BetResult.objects.get_or_create(bet_id=bet_id, player_id=player_id)
+        if player_id in correct_user_ids:
+            bet_result.add_points(bet.multiplier)
+        bet_result.save()
 
     return HttpResponseRedirect(reverse('maingame:running_bets', args=(group_id, event_id)))
 
@@ -495,14 +507,14 @@ def leaderboard(request, group_id, event_id):
         }
 
     # For all completed bets, find the BetResult to count the W/L by player
-    bets_completed = [BetResult.objects.filter(bet=bet) for bet in bets if bet.status.name == 'COMPLETED']
-    
+    bets_completed = [BetResult.objects.filter(bet_id=bet.id) for bet in bets if bet.status.id is StatusType.COMPLETED.value]
     for bet in bets_completed:
+        bet = bet[0]
         player = bet.player.first_name
         if bet.score:
-            bet_results_dict[player.won] += 1
+            bet_results_dict[player]['won'] += 1
         else:
-            bet_results_dict[player.lost] += 1
+            bet_results_dict[player]['lost'] += 1
 
     return render(
       request, 
