@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 import datetime
 import pytz
+import random
 from maingame.utils.enums import StatusType, UserRoles
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -53,7 +54,24 @@ def join_group_and_event(request):
             group_id=group_id,
             event_id=event_id
         )
-        return HttpResponseRedirect(reverse('maingame:add_bets', args=[group_id, event_id]))
+
+        event = Event.objects.get(id=event_id)
+        current_stage_id = event.current_stage.id if event.current_stage else None
+        event_type_id = event.type.id
+        redirect_url = 'add_bets'
+
+        if event_type_id is EventType.STANDARD.value:
+          if current_stage_id is None:
+            redirect_url = redirect_url
+          else:
+            if current_stage_id is StandardEventStages.ADD.value:
+              redirect_url = redirect_url
+            elif current_stage_id in (StandardEventStages.PLACE.value, StandardEventStages.RUN.value):
+              redirect_url = 'show_placements'
+            else:
+              redirect_url = 'leaderboard'
+
+        return HttpResponseRedirect(reverse('maingame:{kwarg}'.format(kwarg=redirect_url), args=[group_id, event_id]))
     except:
         # Redisplay the question voting form.
         return render(
@@ -153,7 +171,7 @@ def lock_bets(request, group_id, event_id):
         event.current_stage_id = StandardEventStages.PLACE.value
     event.save()
 
-    return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id, event_id)))
+    return HttpResponseRedirect(reverse('maingame:show_placements', args=(group_id, event_id)))
 
 @login_required
 def start_event(request, group_id, event_id):
@@ -163,7 +181,18 @@ def start_event(request, group_id, event_id):
         event.current_stage_id = StandardEventStages.RUN.value
     event.save()
 
-    return HttpResponseRedirect(reverse('maingame:group_admin', args=(group_id, event_id)))
+    # Set random Placement for players that did not vote on a specific bet
+    for player in event.players.all():
+        for bet in Bet.objects.filter(event_id=event_id):
+            placement, created = Placement.objects.get_or_create(
+                player_id = player.id,
+                bet_id = bet.id
+            )
+            if not placement.option:
+                placement.option = random.choice(BetOption.objects.filter(bet_id=bet.id))
+                placement.save()
+
+    return HttpResponseRedirect(reverse('maingame:running_bets', args=(group_id, event_id)))
 
 def end_all_bets(event_id):
     bets_for_event = Bet.objects.filter(event_id=event_id)
