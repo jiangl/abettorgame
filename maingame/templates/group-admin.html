@@ -16,7 +16,7 @@
         {% if allow_set_stakes %}
             <button type="submit" class="btn btn-primary">SUBMIT STAKES AND START ADDING BETS</button>
         {% else %}
-            <button type="submit" class="btn btn-secondary disabled" aria-disabled="true">STAKES ARE SET</button>
+            <button type="submit" class="btn btn-secondary disabled" disabled="true">STAKES ARE SET</button>
         {% endif %}
     </div>
 </form>
@@ -69,7 +69,7 @@
                     <button type="submit" class="btn btn-success">START GAME</button>
                 </form>
             {% else %}
-                <button class="btn btn-secondary disabled" role="button" aria-disabled="true">GAME IN SESSION</button>
+                <button class="btn btn-secondary disabled" role="button" disabled="true">GAME IN SESSION</button>
             {% endif %}
         </div>
 
@@ -80,8 +80,11 @@
                   <button type="submit" class="btn btn-danger">END GAME</button>
                 </form>
             {% else %}
-                <button class="btn btn-secondary disabled" role="button" aria-disabled="true">GAME IS OVER!</button>
+                <button class="btn btn-secondary disabled" role="button" disabled="true">GAME IS OVER!</button>
             {% endif %}
         </div>
   </div>
+</div>
+
+<div class="container m-4 p-4">
 </div>
