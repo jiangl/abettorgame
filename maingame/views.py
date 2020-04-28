@@ -547,6 +547,16 @@ def leaderboard(request, group_id, event_id):
                 bet_results_dict[player]['won'] += 1
             else:
                 bet_results_dict[player]['lost'] += 1
+    
+    # Sort by number of wins - will need to update once we use scoring system
+    sorted_bet_results = sorted(bet_results_dict.items(), key=lambda item: item[1]['won'], reverse=True)
+    
+    for index, bet_result in enumerate(sorted_bet_results, start=1):
+        if user_first_name in bet_result:
+            user_bet_results_dict = bet_result[1]
+            user_bet_results_dict['rank'] = index
+    if not user_bet_results_dict:
+        user_bet_results_dict = bet_results_dict[user_first_name]
 
     return render(
       request, 
@@ -555,6 +565,6 @@ def leaderboard(request, group_id, event_id):
       'event': event, 
       'group_id': group_id, 
       'event_commissioner': event_commissioner,
-      'bet_results_dict': bet_results_dict,
-      'user_best_result_dict': bet_results_dict[user_first_name]
+      'sorted_bet_results': sorted_bet_results,
+      'user_bet_results_dict': user_bet_results_dict
       })
