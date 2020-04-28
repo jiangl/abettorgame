@@ -8,7 +8,7 @@
 
 </br> 
 
-<h2 class="col text-center">My Rank: {{user_best_result_dict.rank}}</h2>
+<h2 class="col text-center">My Rank: {{user_bet_results_dict.rank}}</h2>
 
 </br> 
 
@@ -17,15 +17,15 @@
   <div class="row">
     <div class="col">
       Won</br>
-      {{ user_best_result_dict.won }}
+      {{ user_bet_results_dict.won }}
     </div>
     <div class="col">
       Lost</br>
-      {{ user_best_result_dict.lost }}
+      {{ user_bet_results_dict.lost }}
     </div>
     <div class="col">
       Remaining</br>
-      {{ user_best_result_dict.remaining }}
+      {{ user_bet_results_dict.remaining }}
     </div>
   </div>
 </div>
@@ -42,7 +42,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for player, results in bet_results_dict.items %}
+    {% for player, results in sorted_bet_results %}
     <tr>
       <th scope="row">{{ forloop.counter }}</th>
       <td>{{ player }}</td>
