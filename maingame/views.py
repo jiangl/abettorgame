@@ -342,7 +342,7 @@ def show_placements(request, group_id, event_id):
       players_bets_placed = []
       players_bets_awaiting = []
       for player in event.players.all():
-        if len(Placement.objects.filter(player=player)) == len(bets):
+        if len(Placement.objects.filter(player=player, bet__in=bets)) == len(bets):
           players_bets_placed.append(player.first_name)
         else:
           players_bets_awaiting.append(player.first_name)
@@ -467,25 +467,8 @@ def running_bets(request, group_id, event_id):
           'bet_options': bet_options_and_names
           })
 
-      # should this be updated to use list comprehension? or ternary operator?
-      players_bets_placed = []
-      players_bets_awaiting = []
-      for player in event.players.all():
-        if len(Placement.objects.filter(player=player)) == len(bets):
-          players_bets_placed.append(player.first_name)
-        else:
-          players_bets_awaiting.append(player.first_name)
-
     except:
       bets_list = None
-      players_bets_placed = []
-      players_bets_awaiting = []
-
-    # still need to add placements so they render correctly for each user
-
-    #this is reused code from above - move out into a function?
-    is_event_started = event.start_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
-    is_event_ended = event.end_time < datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
     #replace below logic with authentication and logic in view
     usergrouprole = UserGroupRole.objects.get(user=request.user.id, group=group_id)
@@ -500,10 +483,6 @@ def running_bets(request, group_id, event_id):
       'group_id': group_id,
       'event_commissioner': event_commissioner,
       'bets_list': bets_list,
-      'players_bets_placed': players_bets_placed,
-      'players_bets_awaiting': players_bets_awaiting,
-      'is_event_started': is_event_started,
-      'is_event_ended': is_event_ended,
       'is_admin': is_admin
       })
 
