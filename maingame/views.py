@@ -44,6 +44,34 @@ def index(request):
   return render(request, 'index.html', {})
 
 @login_required
+def play(request, group_id, event_id):
+    event = Event.objects.get(id=event_id)
+    current_stage_id = event.current_stage.id if event.current_stage else None
+    event_type_id = event.type.id
+    redirect_url = 'add_bets'
+
+    add_user_to_groupevent(
+            user_id=request.user.id,
+            group_id=group_id,
+            event_id=event_id
+        )
+    
+    if event_type_id is EventType.STANDARD.value:
+        if current_stage_id is None:
+            redirect_url = redirect_url
+        else:
+            if current_stage_id is StandardEventStages.ADD.value:
+                redirect_url = redirect_url
+            elif current_stage_id is StandardEventStages.PLACE.value:
+                redirect_url = 'show_placements'
+            elif current_stage_id is StandardEventStages.RUN.value:
+                redirect_url = 'running_bets'
+            else:
+                redirect_url = 'leaderboard'
+
+    return HttpResponseRedirect(reverse('maingame:{kwarg}'.format(kwarg=redirect_url), args=[group_id, event_id]))
+
+@login_required
 def join_group_and_event(request):
     try:
         groupAndEventIdArray = request.POST["groupAndEventId"].split('-')

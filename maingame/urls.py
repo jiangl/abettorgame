@@ -8,6 +8,7 @@ urlpatterns = [
     path('signup', views.signup, name='signup'),
     path('join-group-and-event', views.join_group_and_event, name='join_group_and_event'),
     path('create-group-and-event', views.create_group_and_event, name='create_group_and_event'),
+    path('<int:group_id>/<int:event_id>/play', views.play, name='play'),
     path('<int:group_id>/<int:event_id>/group-admin', views.group_admin, name='group_admin'),
     path('<int:group_id>/<int:event_id>/set-stakes', views.set_stakes, name='set_stakes'),
     path('<int:group_id>/<int:event_id>/add-bets', views.add_bets, name='add_bets'),
